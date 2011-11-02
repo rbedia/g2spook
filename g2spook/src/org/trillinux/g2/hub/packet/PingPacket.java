@@ -19,7 +19,7 @@
 package org.trillinux.g2.hub.packet;
 
 import org.trillinux.g2.core.NodeAddress;
-import org.trillinux.g2.core.Packet;
+import org.trillinux.g2.core.packet.Packet;
 
 public class PingPacket {
     boolean relay = false;

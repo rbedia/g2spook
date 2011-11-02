@@ -21,17 +21,15 @@ package org.trillinux.g2.hub.routecache;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import org.trillinux.g2.core.NodeAddress;
+import org.trillinux.g2.core.TimerManager;
 
 public class GUIDCache {
     private static final GUIDCache instance = new GUIDCache();
 
     private final Map<byte[], Route> table;
-
-    private final Timer timer;
 
     private static final long PURGE_FREQUENCY = 1000 * 60 * 5; // 5 minutes
 
@@ -39,8 +37,7 @@ public class GUIDCache {
 
     private GUIDCache() {
         table = new HashMap<byte[], Route>();
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
+        TimerManager.schedule(new TimerTask() {
 
             @Override
             public void run() {
@@ -48,7 +45,7 @@ public class GUIDCache {
                 System.out.println(String.format(
                         "Purge %d routes from GUIDCache", purged));
             }
-        }, PURGE_FREQUENCY, PURGE_FREQUENCY);
+        }, PURGE_FREQUENCY);
     }
 
     public synchronized int purge() {

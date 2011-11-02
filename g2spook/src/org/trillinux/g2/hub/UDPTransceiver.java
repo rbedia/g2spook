@@ -28,7 +28,7 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
-import org.trillinux.g2.core.Packet;
+import org.trillinux.g2.core.packet.Packet;
 import org.trillinux.g2.hub.handler.G2DatagramHandler;
 import org.trillinux.g2.hub.handler.G2UDPPacketHandler;
 

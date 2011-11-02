@@ -19,20 +19,18 @@
 package org.trillinux.g2.hub.workers;
 
 import java.io.IOException;
-import java.util.TimerTask;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.trillinux.g2.core.Packet;
+import org.trillinux.g2.core.packet.Packet;
 import org.trillinux.g2.hub.packet.QHT;
 
-public class QHTSender extends TimerTask {
-    ChannelHandlerContext ctx;
+public class QHTSender extends WorkerTask {
 
     public QHTSender(ChannelHandlerContext ctx) {
-        this.ctx = ctx;
+        super(ctx);
     }
 
     public static void send(Channel ch) {
@@ -63,7 +61,7 @@ public class QHTSender extends TimerTask {
     }
 
     @Override
-    public void run() {
+    public void exec() {
         Channel ch = ctx.getChannel();
         send(ch);
     }

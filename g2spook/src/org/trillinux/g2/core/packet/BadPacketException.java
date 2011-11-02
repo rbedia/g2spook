@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with g2spook.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.trillinux.g2.core;
+package org.trillinux.g2.core.packet;
 
 /**
  * Thrown when a packet can not be parsed. The reason the packet is bad will be

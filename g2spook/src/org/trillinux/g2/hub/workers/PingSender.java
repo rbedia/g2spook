@@ -19,23 +19,21 @@
 package org.trillinux.g2.hub.workers;
 
 import java.io.IOException;
-import java.util.TimerTask;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.trillinux.g2.core.Packet;
+import org.trillinux.g2.core.packet.Packet;
 
-public class PingSender extends TimerTask {
-    ChannelHandlerContext ctx;
+public class PingSender extends WorkerTask {
 
     public PingSender(ChannelHandlerContext ctx) {
-        this.ctx = ctx;
+        super(ctx);
     }
 
     @Override
-    public void run() {
+    public void exec() {
         try {
             // System.out.println("PingSender: Sending PI");
             Channel ch = ctx.getChannel();

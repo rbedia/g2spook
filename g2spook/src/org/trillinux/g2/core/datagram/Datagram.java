@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with g2spook.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.trillinux.g2.core;
+package org.trillinux.g2.core.datagram;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,6 +25,8 @@ import java.util.BitSet;
 import java.util.Date;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
+
+import org.trillinux.g2.core.packet.IncompletePacketException;
 
 /**
  * A single GND datagram. Each datagram can be looked up by (ip,sequence). Once

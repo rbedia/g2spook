@@ -28,7 +28,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.trillinux.g2.core.NodeAddress;
-import org.trillinux.g2.core.Packet;
+import org.trillinux.g2.core.packet.Packet;
 import org.trillinux.g2.hub.ConnectionManager;
 import org.trillinux.g2.hub.Hostcache;
 import org.trillinux.g2.hub.Hub;

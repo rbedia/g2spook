@@ -30,9 +30,9 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
-import org.trillinux.g2.core.Datagram;
-import org.trillinux.g2.core.DatagramCache;
-import org.trillinux.g2.core.Packet;
+import org.trillinux.g2.core.datagram.Datagram;
+import org.trillinux.g2.core.datagram.DatagramCache;
+import org.trillinux.g2.core.packet.Packet;
 
 public class G2DatagramHandler extends SimpleChannelHandler {
 

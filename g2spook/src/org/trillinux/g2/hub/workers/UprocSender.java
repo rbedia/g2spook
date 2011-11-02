@@ -19,23 +19,21 @@
 package org.trillinux.g2.hub.workers;
 
 import java.io.IOException;
-import java.util.TimerTask;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.trillinux.g2.core.Packet;
+import org.trillinux.g2.core.packet.Packet;
 
-public class UprocSender extends TimerTask {
-    ChannelHandlerContext ctx;
+public class UprocSender extends WorkerTask {
 
     public UprocSender(ChannelHandlerContext ctx) {
-        this.ctx = ctx;
+        super(ctx);
     }
 
     @Override
-    public void run() {
+    public void exec() {
         try {
             Channel ch = ctx.getChannel();
             Packet p = new Packet("UPROC");

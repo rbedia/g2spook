@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 
@@ -39,6 +38,7 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.trillinux.g2.core.Node;
 import org.trillinux.g2.core.NodeAddress;
+import org.trillinux.g2.core.TimerManager;
 import org.trillinux.g2.core.gwc.GWCManager;
 import org.trillinux.g2.core.gwc.GWCQueryResponse;
 import org.trillinux.g2.hub.handler.GnutellaHttpHandler;
@@ -49,7 +49,6 @@ public class G2HubMain {
     ClientBootstrap tcpClientBootstrap = null;
     ServerBootstrap tcpServerBootstrap = null;
     UDPTransceiver transceiver = null;
-    Timer timer;
 
     GWCManager gwcManager;
 
@@ -57,7 +56,7 @@ public class G2HubMain {
     private static final String DEFAULT_GWC = "http://cache.trillinux.org/g2/bazooka.php";
 
     private void createConnectTimer() {
-        timer.schedule(new TimerTask() {
+        TimerManager.schedule(new TimerTask() {
 
             @Override
             public void run() {
@@ -72,7 +71,6 @@ public class G2HubMain {
     }
 
     public void start() {
-        timer = new Timer();
         gwcManager = new GWCManager();
 
         createConnectTimer();
@@ -82,8 +80,7 @@ public class G2HubMain {
         transceiver = UDPTransceiver.getInstance();
         transceiver.start(NodeInfo.getInstance().getPort());
 
-        // String host = "207.253.54.66";
-        // // String host = "localhost";
+        // String host = "localhost";
         // int port = 6346;
         //
         // try {

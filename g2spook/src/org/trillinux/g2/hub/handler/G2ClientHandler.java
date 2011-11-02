@@ -25,7 +25,6 @@ import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -40,12 +39,13 @@ import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
-import org.trillinux.g2.core.BadPacketException;
-import org.trillinux.g2.core.EndOfChildrenException;
-import org.trillinux.g2.core.EndOfStreamException;
 import org.trillinux.g2.core.Node;
 import org.trillinux.g2.core.NodeAddress;
-import org.trillinux.g2.core.Packet;
+import org.trillinux.g2.core.TimerManager;
+import org.trillinux.g2.core.packet.BadPacketException;
+import org.trillinux.g2.core.packet.EndOfChildrenException;
+import org.trillinux.g2.core.packet.EndOfStreamException;
+import org.trillinux.g2.core.packet.Packet;
 import org.trillinux.g2.hub.Hostcache;
 import org.trillinux.g2.hub.LocalCluster;
 import org.trillinux.g2.hub.QueryLogger;
@@ -64,19 +64,18 @@ import org.xml.sax.SAXException;
 
 public class G2ClientHandler extends SimpleChannelHandler {
 
-    Timer timer;
-
     boolean qhtSent;
 
     G2Context g2ctx;
 
     public G2ClientHandler(ChannelHandlerContext ctx, G2Context g2ctx) {
         this.g2ctx = g2ctx;
-        timer = new Timer();
-        timer.schedule(new PingSender(ctx), 1000, 15 * 1000);
-        timer.schedule(new LniSender(ctx), 3000, 10 * 1000);
-        timer.schedule(new UprocSender(ctx), 10 * 1000); // only send UPROC once
-        // timer.schedule(new QHTSender(ctx), 5000);
+
+        TimerManager.schedule(new PingSender(ctx), 1000, 15 * 1000);
+        TimerManager.schedule(new LniSender(ctx), 3000, 10 * 1000);
+        // only send UPROC once
+        TimerManager.scheduleOnce(new UprocSender(ctx), 10 * 1000);
+        // TimerManager.schedule(new QHTSender(ctx), 5000);
 
         qhtSent = false;
     }
@@ -429,7 +428,6 @@ public class G2ClientHandler extends SimpleChannelHandler {
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx,
             ChannelStateEvent e) throws Exception {
-        timer.cancel();
         InetSocketAddress addr = (InetSocketAddress) e.getChannel()
                 .getRemoteAddress();
         if (addr != null) {

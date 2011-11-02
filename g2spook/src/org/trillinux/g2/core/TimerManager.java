@@ -52,7 +52,7 @@ public class TimerManager {
     }
 
     /**
-     * Schedules a task to occur repeatedly. The first scheduling will be after
+     * Schedules a task to occur repeatedly. The first execution will be after
      * period time.
      * 
      * @param task
@@ -61,6 +61,18 @@ public class TimerManager {
      */
     public static void schedule(TimerTask task, long period) {
         getInstance().timer.schedule(task, period, period);
+    }
+
+    /**
+     * Schedules a task to occur repeatedly. The first execution will be after
+     * delay time. Subsequent executions will occur after period time.
+     * 
+     * @param task
+     * @param period
+     *            time in milliseconds between successive task executions.
+     */
+    public static void schedule(TimerTask task, long delay, long period) {
+        getInstance().timer.schedule(task, delay, period);
     }
 
     /**

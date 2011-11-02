@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with g2spook.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.trillinux.g2.core;
+package org.trillinux.g2.core.datagram;
 
 import java.net.InetAddress;
 import java.util.ConcurrentModificationException;
@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.TimerTask;
+
+import org.trillinux.g2.core.TimerManager;
 
 /**
  * Stores datagrams as they are received from the network.

@@ -19,8 +19,8 @@
 package org.trillinux.g2.hub.packet;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.trillinux.g2.core.EndOfChildrenException;
-import org.trillinux.g2.core.IncompletePacketException;
+import org.trillinux.g2.core.packet.EndOfChildrenException;
+import org.trillinux.g2.core.packet.IncompletePacketException;
 
 public class PacketHeader {
     public boolean be;

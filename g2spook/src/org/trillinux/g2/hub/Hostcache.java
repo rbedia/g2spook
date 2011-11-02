@@ -25,24 +25,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import org.trillinux.g2.core.Node;
 import org.trillinux.g2.core.NodeAddress;
+import org.trillinux.g2.core.TimerManager;
 
 public class Hostcache {
     private static Hostcache instance = new Hostcache();
 
     private final Map<NodeAddress, Hub> nodes;
 
-    private final Timer timer;
-
     private Hostcache() {
         nodes = new HashMap<NodeAddress, Hub>();
-        timer = new Timer();
 
-        timer.schedule(new TimerTask() {
+        TimerManager.schedule(new TimerTask() {
             @Override
             public void run() {
                 try {

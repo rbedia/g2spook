@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.trillinux.g2.core.NodeAddress;
-import org.trillinux.g2.core.Packet;
+import org.trillinux.g2.core.packet.Packet;
 import org.trillinux.g2.hub.util.BigNumUtil;
 
 public class QueryPacket {
