@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Map;
 
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -37,6 +38,7 @@ import org.trillinux.g2.core.NodeAddress;
 import org.trillinux.g2.hub.ConnectionManager;
 import org.trillinux.g2.hub.G2Handshake;
 import org.trillinux.g2.hub.Hostcache;
+import org.trillinux.g2.hub.Hub;
 import org.trillinux.g2.hub.NodeInfo;
 import org.trillinux.g2.settings.Settings;
 
@@ -130,7 +132,18 @@ public class GnutellaHttpHandler extends SimpleChannelHandler {
                             "application/x-gnutella2");
                     response.addHeader("Accept", "application/x-gnutella2");
                     response.addHeader("X-Hub", "True");
-                    // TODO add X-Try-Hubs header
+
+                    // add X-Try-Hubs header
+                    StringBuilder sb = new StringBuilder();
+                    List<Hub> hubs = Hostcache.getInstance().getRandomHubs(10);
+                    for (Hub hub : hubs) {
+                        if (sb.length() != 0) {
+                            sb.append(",");
+                        }
+                        sb.append(hub.getAddress().getIp().getHostAddress())
+                                .append(":").append(hub.getAddress().getPort());
+                    }
+                    response.addHeader("X-Try-Hubs", sb.toString());
 
                     handshakeStage = G2Handshake.Type.RESPONSE2;
 
