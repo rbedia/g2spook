@@ -187,7 +187,8 @@ public class GnutellaHttpHandler extends SimpleChannelHandler {
                 if (contentType == null
                         || !contentType.equals("application/x-gnutella2")) {
                     System.out.println("Host doesn't support G2");
-                    // TODO drop connection
+                    e.getChannel().close();
+                    return;
                 }
 
                 G2Context g2ctx = decodeHeaders(handshake);
