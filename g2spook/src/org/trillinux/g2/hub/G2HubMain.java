@@ -156,7 +156,7 @@ public class G2HubMain {
 
         NodeAddress addr = Hostcache.getInstance().getRandomAddress();
         if (addr == null) {
-            queryGWC();
+            queryGWC(DEFAULT_GWC);
             return;
         }
 
@@ -170,13 +170,16 @@ public class G2HubMain {
         future.addListener(new ConnectionListener(socket));
     }
 
-    private void queryGWC() {
+    private void queryGWC(String gwc) {
         try {
-            GWCQueryResponse response = gwcManager.get(DEFAULT_GWC);
+            System.out.println("Query GWC: " + gwc);
+            GWCQueryResponse response = gwcManager.get(gwc);
             for (String host : response.getHosts()) {
                 Node node = new Node(new NodeAddress(host));
                 Hostcache.getInstance().addHost(node);
             }
+            System.out.println(String.format("Found %d hosts, %d GWCs",
+                    response.getHosts().size(), response.getGwcs().size()));
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
