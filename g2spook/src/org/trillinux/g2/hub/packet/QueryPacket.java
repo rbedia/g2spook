@@ -79,13 +79,6 @@ public class QueryPacket {
                 byte[] hash = new byte[payload.length - end - 1];
                 System.arraycopy(payload, end + 1, hash, 0, hash.length);
                 String family = new String(sub);
-                if (family.equals("sha1") || family.equals("bp")
-                        || family.equals("ed2k") || family.equals("md5")
-                        || family.equals("btih")) {
-                    // System.out.println(family + " " + hash.length);
-                } else {
-                    System.out.println("Unknown hash: " + family);
-                }
                 urns.add(new Hash(family, hash));
             } else if (child.getName().equals("dna")) {
                 dna = true;
