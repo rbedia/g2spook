@@ -130,7 +130,6 @@ public class Packet implements Serializable {
         XmlWriter simplexml = new SimpleXmlWriter(writer);
         PrettyPrinterXmlWriter xmlwriter = new PrettyPrinterXmlWriter(simplexml);
         try {
-            xmlwriter.writeXmlVersion();
             xml(xmlwriter);
 
             xmlwriter.close();
