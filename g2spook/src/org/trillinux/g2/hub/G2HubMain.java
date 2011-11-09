@@ -78,7 +78,7 @@ public class G2HubMain {
         startTcpServer();
         startTcpClient();
         transceiver = UDPTransceiver.getInstance();
-        transceiver.start(NodeInfo.getInstance().getPort());
+        transceiver.start(LocalInfo.getInstance().getNode().getPort());
 
         // String host = "localhost";
         // int port = 6346;
@@ -137,8 +137,8 @@ public class G2HubMain {
         tcpServerBootstrap.setOption("tcpNoDelay", true);
         tcpServerBootstrap.setOption("keepAlive", true);
 
-        tcpServerBootstrap.bind(new InetSocketAddress(NodeInfo.getInstance()
-                .getPort()));
+        tcpServerBootstrap.bind(new InetSocketAddress(LocalInfo.getInstance()
+                .getNode().getPort()));
     }
 
     private void connect() throws InterruptedException {

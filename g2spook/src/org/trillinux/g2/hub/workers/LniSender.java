@@ -25,6 +25,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.trillinux.g2.core.packet.Packet;
+import org.trillinux.g2.hub.LocalInfo;
 import org.trillinux.g2.hub.NodeInfo;
 
 public class LniSender extends WorkerTask {
@@ -36,7 +37,7 @@ public class LniSender extends WorkerTask {
     @Override
     public void exec() {
         try {
-            NodeInfo nodeInfo = NodeInfo.getInstance();
+            NodeInfo nodeInfo = LocalInfo.getInstance().getNode();
             Channel ch = ctx.getChannel();
             Packet lni = new Packet("LNI");
 

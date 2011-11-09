@@ -19,39 +19,39 @@
 package org.trillinux.g2.hub;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
-public class NodeInfo {
+public class LocalInfo {
 
-    private InetAddress address;
+    private static LocalInfo instance = new LocalInfo();
 
-    private int port;
+    private final NodeInfo node;
 
-    private byte[] guid;
-
-    public NodeInfo() {
+    private LocalInfo() {
+        node = new NodeInfo();
+        try {
+            node.setAddress(InetAddress.getLocalHost());
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        node.setPort(1234);
+        byte[] guid = new byte[16];
+        for (int i = 0; i < guid.length; i++) {
+            guid[i] = (byte) i;
+        }
+        node.setGuid(guid);
     }
 
-    public InetAddress getAddress() {
-        return address;
+    public static LocalInfo getInstance() {
+        return instance;
     }
 
-    public void setAddress(InetAddress address) {
-        this.address = address;
+    /**
+     * @return the node
+     */
+    public NodeInfo getNode() {
+        return node;
     }
 
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public byte[] getGuid() {
-        return guid;
-    }
-
-    public void setGuid(byte[] guid) {
-        this.guid = guid;
-    }
 }

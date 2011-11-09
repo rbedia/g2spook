@@ -39,7 +39,7 @@ import org.trillinux.g2.hub.ConnectionManager;
 import org.trillinux.g2.hub.G2Handshake;
 import org.trillinux.g2.hub.Hostcache;
 import org.trillinux.g2.hub.Hub;
-import org.trillinux.g2.hub.NodeInfo;
+import org.trillinux.g2.hub.LocalInfo;
 import org.trillinux.g2.settings.Settings;
 
 public class GnutellaHttpHandler extends SimpleChannelHandler {
@@ -69,7 +69,8 @@ public class GnutellaHttpHandler extends SimpleChannelHandler {
             } else if (name.equalsIgnoreCase("Remote-IP")) {
                 try {
                     ctx.setRemoteIp(InetAddress.getByName(value));
-                    NodeInfo.getInstance().setAddress(ctx.getRemoteIp());
+                    LocalInfo.getInstance().getNode()
+                            .setAddress(ctx.getRemoteIp());
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                     return null;
