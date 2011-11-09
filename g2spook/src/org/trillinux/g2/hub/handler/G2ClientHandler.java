@@ -48,6 +48,7 @@ import org.trillinux.g2.core.packet.EndOfStreamException;
 import org.trillinux.g2.core.packet.Packet;
 import org.trillinux.g2.hub.Hostcache;
 import org.trillinux.g2.hub.LocalCluster;
+import org.trillinux.g2.hub.NodeInfo;
 import org.trillinux.g2.hub.QueryLogger;
 import org.trillinux.g2.hub.UDPTransceiver;
 import org.trillinux.g2.hub.packet.PingPacket;
@@ -261,11 +262,8 @@ public class G2ClientHandler extends SimpleChannelHandler {
     }
 
     private void handleLNI(Packet p) {
-        boolean qk = false;
-        boolean fw = false;
+        NodeInfo nodeInfo = new NodeInfo();
         NodeAddress nodeAddr = null;
-        byte[] guid = null;
-        String vendor = null;
 
         for (Packet child : p.getChildren()) {
             if (child.getName().equals("NA")) {
@@ -274,14 +272,18 @@ public class G2ClientHandler extends SimpleChannelHandler {
                     System.arraycopy(child.getPayload(), 0, addr, 0,
                             addr.length);
                     nodeAddr = new NodeAddress(addr);
+                    nodeInfo.setIp(nodeAddr.getIp());
+                    nodeInfo.setPort(nodeAddr.getPort());
                 }
             } else if (child.getName().equals("GU")) {
                 byte[] payload = child.getPayload();
                 if (payload.length == 16) {
-                    guid = payload;
+                    byte[] guid = payload;
+                    nodeInfo.setGuid(guid);
                 }
             } else if (child.getName().equals("V")) {
-                vendor = new String(child.getPayload());
+                String vendor = new String(child.getPayload());
+                nodeInfo.setVendor(vendor);
             } else if (child.getName().equals("LS")) {
                 byte[] payload = child.getPayload();
                 if (payload.length >= 8) {
@@ -289,12 +291,8 @@ public class G2ClientHandler extends SimpleChannelHandler {
                             + ((payload[2] & 0xFF) << 16)
                             + ((payload[1] & 0xFF) << 8) + (payload[0] & 0xFF);
                     BigInteger size = BigNumUtil.getBigInteger(payload, 4, 4);
-
-                    if (size.compareTo(new BigInteger("0")) < 0) {
-                        System.out.println("size negative: " + size);
-                    }
-                    System.out.println("Library: " + files + ", "
-                            + getScaledSize(size.longValue()));
+                    nodeInfo.setFiles(files);
+                    nodeInfo.setLibrarySize(size.longValue());
                 } else {
                     // System.out.println("/LNI/LS payload size unexpected: "
                     // + payload.length);
@@ -305,22 +303,24 @@ public class G2ClientHandler extends SimpleChannelHandler {
                 int maxLeaves = ((payload[3] & 0xFF) << 8)
                         + (payload[2] & 0xFF);
 
-                System.out.println("Leaves: " + leaves + ", " + maxLeaves);
+                nodeInfo.setLeaves(leaves);
+                nodeInfo.setMaxLeaves(maxLeaves);
             } else if (child.getName().equals("QK")) {
-                qk = true;
+                nodeInfo.setQk(true);
             } else if (child.getName().equals("FW")) {
-                fw = true;
+                nodeInfo.setFw(true);
             } else {
                 System.out.println("Unknown LNI child: " + child.getName());
             }
         }
 
-        if (guid != null && nodeAddr != null) {
-            GUIDCache.getInstance().addRoute(guid, nodeAddr);
-        }
+        System.out.println("Leaves: " + nodeInfo.getLeaves() + ", "
+                + nodeInfo.getMaxLeaves());
+        System.out.println("Library: " + nodeInfo.getFiles() + ", "
+                + getScaledSize(nodeInfo.getLibrarySize()));
 
-        if (qk) {
-            System.out.println("QK: Yes");
+        if (nodeInfo.getGuid() != null && nodeAddr != null) {
+            GUIDCache.getInstance().addRoute(nodeInfo.getGuid(), nodeAddr);
         }
     }
 

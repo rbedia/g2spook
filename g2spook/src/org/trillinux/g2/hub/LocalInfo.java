@@ -30,7 +30,7 @@ public class LocalInfo {
     private LocalInfo() {
         node = new NodeInfo();
         try {
-            node.setAddress(InetAddress.getLocalHost());
+            node.setIp(InetAddress.getLocalHost());
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

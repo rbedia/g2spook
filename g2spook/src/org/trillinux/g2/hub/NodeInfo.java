@@ -22,21 +22,35 @@ import java.net.InetAddress;
 
 public class NodeInfo {
 
-    private InetAddress address;
+    private InetAddress ip;
 
     private int port;
 
     private byte[] guid;
 
+    private String vendor;
+
+    private boolean qk;
+
+    private boolean fw;
+
+    private int leaves;
+
+    private int maxLeaves;
+
+    private long files;
+
+    private long librarySize;
+
     public NodeInfo() {
     }
 
-    public InetAddress getAddress() {
-        return address;
+    public InetAddress getIp() {
+        return ip;
     }
 
-    public void setAddress(InetAddress address) {
-        this.address = address;
+    public void setIp(InetAddress ip) {
+        this.ip = ip;
     }
 
     public int getPort() {
@@ -53,5 +67,110 @@ public class NodeInfo {
 
     public void setGuid(byte[] guid) {
         this.guid = guid;
+    }
+
+    /**
+     * @return the vendor
+     */
+    public String getVendor() {
+        return vendor;
+    }
+
+    /**
+     * @param vendor
+     *            the vendor to set
+     */
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
+    }
+
+    /**
+     * @return the qk
+     */
+    public boolean isQk() {
+        return qk;
+    }
+
+    /**
+     * @param qk
+     *            the qk to set
+     */
+    public void setQk(boolean qk) {
+        this.qk = qk;
+    }
+
+    /**
+     * @return the fw
+     */
+    public boolean isFw() {
+        return fw;
+    }
+
+    /**
+     * @param fw
+     *            the fw to set
+     */
+    public void setFw(boolean fw) {
+        this.fw = fw;
+    }
+
+    /**
+     * @return the leaves
+     */
+    public int getLeaves() {
+        return leaves;
+    }
+
+    /**
+     * @param leaves
+     *            the leaves to set
+     */
+    public void setLeaves(int leaves) {
+        this.leaves = leaves;
+    }
+
+    /**
+     * @return the maxLeaves
+     */
+    public int getMaxLeaves() {
+        return maxLeaves;
+    }
+
+    /**
+     * @param maxLeaves
+     *            the maxLeaves to set
+     */
+    public void setMaxLeaves(int maxLeaves) {
+        this.maxLeaves = maxLeaves;
+    }
+
+    /**
+     * @return the files
+     */
+    public long getFiles() {
+        return files;
+    }
+
+    /**
+     * @param files
+     *            the files to set
+     */
+    public void setFiles(long files) {
+        this.files = files;
+    }
+
+    /**
+     * @return the librarySize
+     */
+    public long getLibrarySize() {
+        return librarySize;
+    }
+
+    /**
+     * @param librarySize
+     *            the librarySize to set
+     */
+    public void setLibrarySize(long librarySize) {
+        this.librarySize = librarySize;
     }
 }

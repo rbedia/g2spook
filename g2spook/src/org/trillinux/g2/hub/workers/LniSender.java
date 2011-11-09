@@ -43,7 +43,7 @@ public class LniSender extends WorkerTask {
 
             Packet na = new Packet("NA");
             byte[] addr = new byte[6];
-            byte[] ip = nodeInfo.getAddress().getAddress();
+            byte[] ip = nodeInfo.getIp().getAddress();
             for (int i = 0; i < ip.length; i++) {
                 addr[i] = ip[i];
             }

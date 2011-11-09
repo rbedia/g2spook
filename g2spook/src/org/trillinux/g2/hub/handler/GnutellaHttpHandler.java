@@ -70,7 +70,7 @@ public class GnutellaHttpHandler extends SimpleChannelHandler {
                 try {
                     ctx.setRemoteIp(InetAddress.getByName(value));
                     LocalInfo.getInstance().getNode()
-                            .setAddress(ctx.getRemoteIp());
+                            .setIp(ctx.getRemoteIp());
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                     return null;
