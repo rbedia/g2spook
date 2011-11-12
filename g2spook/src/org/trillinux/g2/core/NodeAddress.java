@@ -33,7 +33,7 @@ public class NodeAddress implements Serializable {
     private static final long serialVersionUID = 7259811352355235438L;
 
     private InetAddress ip;
-    private final int port;
+    private int port;
 
     public NodeAddress(InetAddress ip, int port) {
         this.ip = ip;
@@ -109,8 +109,24 @@ public class NodeAddress implements Serializable {
         return ip;
     }
 
+    /**
+     * @param ip
+     *            the ip to set
+     */
+    public void setIp(InetAddress ip) {
+        this.ip = ip;
+    }
+
     public int getPort() {
         return port;
+    }
+
+    /**
+     * @param port
+     *            the port to set
+     */
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public byte[] toBytes() {

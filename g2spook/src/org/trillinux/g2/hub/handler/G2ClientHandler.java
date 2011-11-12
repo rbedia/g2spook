@@ -263,7 +263,6 @@ public class G2ClientHandler extends SimpleChannelHandler {
 
     private void handleLNI(Packet p) {
         NodeInfo nodeInfo = new NodeInfo();
-        NodeAddress nodeAddr = null;
 
         for (Packet child : p.getChildren()) {
             if (child.getName().equals("NA")) {
@@ -271,9 +270,8 @@ public class G2ClientHandler extends SimpleChannelHandler {
                     byte[] addr = new byte[6];
                     System.arraycopy(child.getPayload(), 0, addr, 0,
                             addr.length);
-                    nodeAddr = new NodeAddress(addr);
-                    nodeInfo.setIp(nodeAddr.getIp());
-                    nodeInfo.setPort(nodeAddr.getPort());
+                    NodeAddress nodeAddr = new NodeAddress(addr);
+                    nodeInfo.setAddress(nodeAddr);
                 }
             } else if (child.getName().equals("GU")) {
                 byte[] payload = child.getPayload();
@@ -319,8 +317,9 @@ public class G2ClientHandler extends SimpleChannelHandler {
         System.out.println("Library: " + nodeInfo.getFiles() + ", "
                 + getScaledSize(nodeInfo.getLibrarySize()));
 
-        if (nodeInfo.getGuid() != null && nodeAddr != null) {
-            GUIDCache.getInstance().addRoute(nodeInfo.getGuid(), nodeAddr);
+        if (nodeInfo.getGuid() != null && nodeInfo.getAddress() != null) {
+            GUIDCache.getInstance().addRoute(nodeInfo.getGuid(),
+                    nodeInfo.getAddress());
         }
     }
 
@@ -370,20 +369,10 @@ public class G2ClientHandler extends SimpleChannelHandler {
         List<NodeAddress> peers = new ArrayList<NodeAddress>();
 
         for (Packet child : p.getChildren()) {
-            if (child.getName().equals("CH")) {
-                if (child.getPayload().length == 10) {
-                    NodeAddress nodeAddr = readNodeAddress(child.getPayload());
-                    Node node = new Node(nodeAddr);
-                    Hostcache.getInstance().addHost(node);
-                    // TODO handle timestamp
-                }
-            } else if (child.getName().equals("NH")) {
-                if (child.getPayload().length == 6) {
-                    NodeAddress nodeAddr = readNodeAddress(child.getPayload());
-                    Node node = new Node(nodeAddr);
-                    Hostcache.getInstance().addHost(node);
-                    peers.add(nodeAddr);
-                }
+            if (child.getName().equals("CH") || child.getName().equals("NH")) {
+                NodeInfo nodeInfo = parseHubPacket(child);
+                Node node = new Node(nodeInfo.getAddress());
+                Hostcache.getInstance().addHost(node);
             } else if (child.getName().equals("TS")) {
                 // TODO handle timestamp
             } else {
@@ -400,6 +389,54 @@ public class G2ClientHandler extends SimpleChannelHandler {
 
         System.out.println("Host count: "
                 + Hostcache.getInstance().getHostCount());
+    }
+
+    private NodeInfo parseHubPacket(Packet p) {
+        NodeInfo nodeInfo = new NodeInfo();
+        if (p.getPayload().length >= 6) {
+            NodeAddress nodeAddr = readNodeAddress(p.getPayload());
+            nodeInfo.setAddress(nodeAddr);
+        }
+        if (p.getPayload().length == 10) {
+            // TODO handle timestamp in the last 4 bytes
+        }
+        for (Packet child : p.getChildren()) {
+            if (child.getName().equals("GU")) {
+                byte[] payload = child.getPayload();
+                if (payload.length == 16) {
+                    byte[] guid = payload;
+                    nodeInfo.setGuid(guid);
+                }
+            } else if (child.getName().equals("V")) {
+                String vendor = new String(child.getPayload());
+                nodeInfo.setVendor(vendor);
+            } else if (child.getName().equals("LS")) {
+                byte[] payload = child.getPayload();
+                if (payload.length >= 8) {
+                    long files = ((payload[3] & 0xFF) << 24)
+                            + ((payload[2] & 0xFF) << 16)
+                            + ((payload[1] & 0xFF) << 8) + (payload[0] & 0xFF);
+                    BigInteger size = BigNumUtil.getBigInteger(payload, 4, 4);
+                    nodeInfo.setFiles(files);
+                    nodeInfo.setLibrarySize(size.longValue());
+                } else {
+                    // System.out.println("/LNI/LS payload size unexpected: "
+                    // + payload.length);
+                }
+            } else if (child.getName().equals("HS")) {
+                byte[] payload = child.getPayload();
+                int leaves = ((payload[1] & 0xFF) << 8) + (payload[0] & 0xFF);
+                int maxLeaves = ((payload[3] & 0xFF) << 8)
+                        + (payload[2] & 0xFF);
+
+                nodeInfo.setLeaves(leaves);
+                nodeInfo.setMaxLeaves(maxLeaves);
+            } else {
+                System.out
+                        .println("Unknown KHL node child: " + child.getName());
+            }
+        }
+        return nodeInfo;
     }
 
     private void handleHAW(Packet p) {

@@ -21,6 +21,8 @@ package org.trillinux.g2.hub;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.trillinux.g2.core.NodeAddress;
+
 public class LocalInfo {
 
     private static LocalInfo instance = new LocalInfo();
@@ -29,13 +31,17 @@ public class LocalInfo {
 
     private LocalInfo() {
         node = new NodeInfo();
+
+        InetAddress ip = null;
         try {
-            node.setIp(InetAddress.getLocalHost());
+            ip = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        node.setPort(1234);
+        NodeAddress address = new NodeAddress(ip, 1234);
+        node.setAddress(address);
+
         byte[] guid = new byte[16];
         for (int i = 0; i < guid.length; i++) {
             guid[i] = (byte) i;

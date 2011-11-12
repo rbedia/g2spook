@@ -18,13 +18,11 @@
  */
 package org.trillinux.g2.hub;
 
-import java.net.InetAddress;
+import org.trillinux.g2.core.NodeAddress;
 
 public class NodeInfo {
 
-    private InetAddress ip;
-
-    private int port;
+    private NodeAddress address;
 
     private byte[] guid;
 
@@ -45,20 +43,19 @@ public class NodeInfo {
     public NodeInfo() {
     }
 
-    public InetAddress getIp() {
-        return ip;
+    /**
+     * @return the address
+     */
+    public NodeAddress getAddress() {
+        return address;
     }
 
-    public void setIp(InetAddress ip) {
-        this.ip = ip;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
+    /**
+     * @param address
+     *            the address to set
+     */
+    public void setAddress(NodeAddress address) {
+        this.address = address;
     }
 
     public byte[] getGuid() {

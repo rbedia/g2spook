@@ -78,18 +78,8 @@ public class G2HubMain {
         startTcpServer();
         startTcpClient();
         transceiver = UDPTransceiver.getInstance();
-        transceiver.start(LocalInfo.getInstance().getNode().getPort());
-
-        // String host = "localhost";
-        // int port = 6346;
-        //
-        // try {
-        // InetAddress ip = InetAddress.getByName(host);
-        // Hostcache.getInstance().addHost(new Node(ip, port));
-        // } catch (UnknownHostException e) {
-        // // TODO Auto-generated catch block
-        // e.printStackTrace();
-        // }
+        transceiver.start(LocalInfo.getInstance().getNode().getAddress()
+                .getPort());
     }
 
     private void startTcpClient() {
@@ -138,7 +128,7 @@ public class G2HubMain {
         tcpServerBootstrap.setOption("keepAlive", true);
 
         tcpServerBootstrap.bind(new InetSocketAddress(LocalInfo.getInstance()
-                .getNode().getPort()));
+                .getNode().getAddress().getPort()));
     }
 
     private void connect() throws InterruptedException {
