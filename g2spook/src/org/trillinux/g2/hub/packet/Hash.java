@@ -18,7 +18,9 @@
  */
 package org.trillinux.g2.hub.packet;
 
-public class Hash {
+import java.io.Serializable;
+
+public class Hash implements Serializable {
     private String family;
 
     private byte[] hash;

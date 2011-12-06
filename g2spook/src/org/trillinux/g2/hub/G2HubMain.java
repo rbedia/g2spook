@@ -41,6 +41,7 @@ import org.trillinux.g2.core.NodeAddress;
 import org.trillinux.g2.core.TimerManager;
 import org.trillinux.g2.core.gwc.GWCManager;
 import org.trillinux.g2.core.gwc.GWCQueryResponse;
+import org.trillinux.g2.hub.controller.ControllerServer;
 import org.trillinux.g2.hub.handler.GnutellaHttpHandler;
 import org.trillinux.g2.hub.handler.HttpDecoder;
 import org.trillinux.g2.settings.Settings;
@@ -49,6 +50,8 @@ public class G2HubMain {
     ClientBootstrap tcpClientBootstrap = null;
     ServerBootstrap tcpServerBootstrap = null;
     UDPTransceiver transceiver = null;
+
+    ControllerServer controller = null;
 
     GWCManager gwcManager;
 
@@ -72,6 +75,9 @@ public class G2HubMain {
 
     public void start() {
         gwcManager = new GWCManager();
+
+        controller = new ControllerServer();
+        controller.start();
 
         createConnectTimer();
 

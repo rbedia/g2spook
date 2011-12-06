@@ -18,6 +18,7 @@
  */
 package org.trillinux.g2.hub.packet;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +28,7 @@ import org.trillinux.g2.core.NodeAddress;
 import org.trillinux.g2.core.packet.Packet;
 import org.trillinux.g2.hub.util.BigNumUtil;
 
-public class QueryPacket {
+public class QueryPacket implements Serializable {
     private byte[] guid;
 
     private String dn;

@@ -16,32 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with g2spook.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.trillinux.g2.hub;
+package org.trillinux.g2.hub.ui;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
+import java.io.Serializable;
 
-public class QueryLogger {
+public interface ClientCallback<T extends Serializable> {
 
-    private static QueryLogger instance = new QueryLogger();
-
-    PrintWriter out;
-
-    private QueryLogger() {
-        try {
-            out = new PrintWriter(new FileOutputStream("queries.txt"), true);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public static QueryLogger getInstance() {
-        return instance;
-    }
-
-    public synchronized void log(String query) {
-        out.println(query);
-    }
+    public void response(Serializable message, Object response);
 }

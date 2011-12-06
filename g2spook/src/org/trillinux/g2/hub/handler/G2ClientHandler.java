@@ -49,11 +49,11 @@ import org.trillinux.g2.core.packet.Packet;
 import org.trillinux.g2.hub.Hostcache;
 import org.trillinux.g2.hub.LocalCluster;
 import org.trillinux.g2.hub.NodeInfo;
-import org.trillinux.g2.hub.QueryLogger;
 import org.trillinux.g2.hub.UDPTransceiver;
 import org.trillinux.g2.hub.packet.PingPacket;
 import org.trillinux.g2.hub.packet.QueryPacket;
 import org.trillinux.g2.hub.routecache.GUIDCache;
+import org.trillinux.g2.hub.stats.QueryLogger;
 import org.trillinux.g2.hub.util.BigNumUtil;
 import org.trillinux.g2.hub.workers.LniSender;
 import org.trillinux.g2.hub.workers.PingSender;
@@ -141,18 +141,9 @@ public class G2ClientHandler extends SimpleChannelHandler {
     }
 
     private void handleQ2(MessageEvent e, Packet p) {
-        for (Packet child : p.getChildren()) {
-            if (child.getName().equals("DN")) {
-                // child.print();
-                QueryLogger.getInstance().log(new String(child.getPayload()));
-            }
-        }
         QueryPacket qp = new QueryPacket();
         qp.decode(p);
-        // if (qp.isDna() && qp.getDn() != null) {
-        // System.out.println(qp);
-        // }
-        // System.out.println(qp);
+        QueryLogger.getInstance().log(qp);
     }
 
     private void handleUPROD(Packet p) {
