@@ -23,6 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.doxu.g2.gwc.crawler.model.Host;
 import org.doxu.g2.gwc.crawler.model.Service;
 
 public class Crawler {
@@ -66,6 +67,9 @@ public class Crawler {
             Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        HostChecker hostChecker = new HostChecker(session);
+        hostChecker.start();
+
         printStats();
     }
 
@@ -101,7 +105,18 @@ public class Crawler {
         System.out.println("Error: " + connectError);
 
         for (Service service : services) {
-            System.out.println(service.getUrl() + " - " + service.getStatus());
+            int online = 0;
+            for (Host host : service.getHosts()) {
+                if (host.isOnline()) {
+                    online++;
+                }
+            }
+            int hosts = service.getHosts().size();
+            int deltaAgeHosts = service.getDeltaAgeHosts();
+            int deltaAgeUrls = service.getDeltaAgeUrls();
+            System.out.println(service.getUrl() + " - " + service.getStatus()
+                    + " - " + online + "/" + hosts + " - " + deltaAgeHosts
+                    + " - " + deltaAgeUrls);
         }
     }
 

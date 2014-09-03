@@ -21,6 +21,7 @@ public class GWCURL {
 
     private String address;
     private int age;
+    private boolean online;
 
     public String getAddress() {
         return address;
@@ -36,5 +37,13 @@ public class GWCURL {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 }

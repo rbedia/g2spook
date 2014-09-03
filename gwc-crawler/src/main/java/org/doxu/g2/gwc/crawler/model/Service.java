@@ -86,4 +86,26 @@ public class Service {
     public void addURL(GWCURL url) {
         urls.add(url);
     }
+
+    public int getDeltaAgeHosts() {
+        if (hosts.isEmpty()) {
+            return 0;
+        }
+        int sum = 0;
+        for (Host host : hosts) {
+            sum += host.getAge();
+        }
+        return sum / hosts.size();
+    }
+
+    public int getDeltaAgeUrls() {
+        if (urls.isEmpty()) {
+            return 0;
+        }
+        int sum = 0;
+        for (GWCURL gwcUrl : urls) {
+            sum += gwcUrl.getAge();
+        }
+        return sum / urls.size();
+    }
 }

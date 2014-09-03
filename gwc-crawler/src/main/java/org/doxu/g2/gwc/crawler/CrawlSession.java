@@ -17,6 +17,8 @@
  */
 package org.doxu.g2.gwc.crawler;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import org.doxu.g2.gwc.crawler.model.Host;
 import org.doxu.g2.gwc.crawler.model.Service;
 
 public class CrawlSession {
@@ -91,5 +94,16 @@ public class CrawlSession {
         synchronized (services) {
             services.add(service);
         }
+    }
+
+    public ListMultimap<String, Host> getHosts() {
+        ListMultimap<String, Host> hosts = ArrayListMultimap.create();
+//        Set<String> hosts = new HashSet<>();
+        for (Service service : services) {
+            for (Host host : service.getHosts()) {
+                hosts.put(host.getAddress(), host);
+            }
+        }
+        return hosts;
     }
 }

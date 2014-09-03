@@ -61,10 +61,15 @@ public class CrawlThread implements Runnable {
     private void crawlGWC(String gwcUrl, final CloseableHttpClient httpclient) {
         URI uri = basicGet(gwcUrl);
         InetAddress address = getIPAddress(uri);
-        String ip = address.getHostAddress();
+        String ip = null;
+        if (address != null) {
+            ip = address.getHostAddress();
+        }
 
         Service service = new Service(gwcUrl, ip);
-        if (isAddressBlocked(address)) {
+        if (ip == null) {
+            service.setStatus(Status.BAD_IP);
+        } else if (isAddressBlocked(address)) {
             service.setStatus(Status.BAD_IP);
         } else if (uri != null) {
             HttpGet httpget = new HttpGet(uri);
