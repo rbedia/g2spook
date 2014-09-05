@@ -17,12 +17,10 @@
  */
 package org.doxu.g2.gwc.crawler;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -34,14 +32,16 @@ public class CrawlSession {
     private final Set<String> crawled;
     private final BlockingQueue<String> queue;
 
-    private final List<Service> services;
+    private final Map<String, Service> services;
+    private final Map<String, Host> hosts;
 
     private final Object mutex = new Object();
 
     public CrawlSession() {
         crawled = Collections.synchronizedSet(new HashSet<String>());
         queue = new LinkedBlockingQueue<>();
-        services = new ArrayList<>();
+        services = new HashMap<>();
+        hosts = Collections.synchronizedMap(new HashMap<String, Host>());
     }
 
     public void addURL(String url) {
@@ -86,24 +86,31 @@ public class CrawlSession {
         }
     }
 
-    public List<Service> getServices() {
+    public Service addService(String address) {
+        synchronized (services) {
+            Service entry = services.get(address);
+            if (entry == null) {
+                entry = new Service(address);
+                services.put(address, entry);
+            }
+            return entry;
+        }
+    }
+
+    public Map<String, Service> getServices() {
         return services;
     }
 
-    public void addService(Service service) {
-        synchronized (services) {
-            services.add(service);
+    public Host addHost(String address) {
+        Host entry = hosts.get(address);
+        if (entry == null) {
+            entry = new Host(address);
+            hosts.put(address, entry);
         }
+        return entry;
     }
 
-    public ListMultimap<String, Host> getHosts() {
-        ListMultimap<String, Host> hosts = ArrayListMultimap.create();
-//        Set<String> hosts = new HashSet<>();
-        for (Service service : services) {
-            for (Host host : service.getHosts()) {
-                hosts.put(host.getAddress(), host);
-            }
-        }
+    public Map<String, Host> getHosts() {
         return hosts;
     }
 }

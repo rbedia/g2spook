@@ -17,9 +17,9 @@
  */
 package org.doxu.g2.gwc.crawler;
 
-import com.google.common.collect.ListMultimap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -41,7 +41,7 @@ public class HostChecker {
     }
 
     public void start() {
-        ListMultimap<String, Host> hosts = session.getHosts();
+        Map<String, Host> hosts = session.getHosts();
         // create thread pool executor
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 HOST_THREADS, HOST_THREADS,
@@ -50,7 +50,7 @@ public class HostChecker {
 
         // execute host checks
         List<Future<HostStatus>> futures = new ArrayList<>(hosts.keySet().size());
-        for (String host : hosts.keySet()) {
+        for (Host host : hosts.values()) {
             futures.add(executor.submit(new HostThread(host)));
         }
 
@@ -58,9 +58,8 @@ public class HostChecker {
         for (Future<HostStatus> future : futures) {
             try {
                 HostStatus status = future.get();
-                for (Host host : hosts.get(status.getAddress())) {
-                    host.setOnline(status.isOnline());
-                }
+                Host host = status.getHost();
+                host.setOnline(status.isOnline());
             } catch (InterruptedException | ExecutionException ex) {
                 Logger.getLogger(HostChecker.class.getName()).log(Level.SEVERE, null, ex);
             }

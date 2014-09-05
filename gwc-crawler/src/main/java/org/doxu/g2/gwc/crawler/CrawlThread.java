@@ -32,8 +32,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.doxu.g2.gwc.crawler.model.GWCURL;
+import org.doxu.g2.gwc.crawler.model.ServiceRef;
 import org.doxu.g2.gwc.crawler.model.Host;
+import org.doxu.g2.gwc.crawler.model.HostRef;
 import org.doxu.g2.gwc.crawler.model.Service;
 import org.doxu.g2.gwc.crawler.model.Status;
 
@@ -66,9 +67,10 @@ public class CrawlThread implements Runnable {
             ip = address.getHostAddress();
         }
 
-        Service service = new Service(gwcUrl, ip);
+        Service service = session.addService(gwcUrl);
+        service.setIp(ip);
         if (ip == null) {
-            service.setStatus(Status.BAD_IP);
+            service.setStatus(Status.BAD_DNS);
         } else if (isAddressBlocked(address)) {
             service.setStatus(Status.BAD_IP);
         } else if (uri != null) {
@@ -78,14 +80,13 @@ public class CrawlThread implements Runnable {
                     parseResponse(service, response);
                     service.setStatus(Status.WORKING);
                 } else {
-                    service.setStatus(Status.CONNECT_ERROR);
+                    service.setStatus(Status.HTTP_ERROR);
                 }
             } catch (IOException ex) {
                 service.setStatus(Status.CONNECT_ERROR);
                 Logger.getLogger(CrawlThread.class.getName()).log(Level.FINE, null, ex);
             }
         }
-        session.addService(service);
         System.out.println("Service: " + service.getUrl());
         System.out.println("  Status: " + service.getStatus());
         System.out.println("  IP: " + service.getIp());
@@ -136,10 +137,9 @@ public class CrawlThread implements Runnable {
                         address = line.substring(2);
                         age = 0;
                     }
-                    Host host = new Host();
-                    host.setAddress(address);
-                    host.setAge(age);
-                    service.addHost(host);
+                    Host host = session.addHost(address);
+                    HostRef hostRef = new HostRef(host, age);
+                    service.addHost(hostRef);
 
 //                    System.out.println("Host: " + host + " - " + age);
                 } else if (line.startsWith("u|") || line.startsWith("U|")) {
@@ -153,10 +153,9 @@ public class CrawlThread implements Runnable {
                         address = line.substring(2);
                         age = 0;
                     }
-                    GWCURL gwcURL = new GWCURL();
-                    gwcURL.setAddress(address);
-                    gwcURL.setAge(age);
-                    service.addURL(gwcURL);
+                    Service recvService = session.addService(address);
+                    ServiceRef serviceRef = new ServiceRef(recvService, age);
+                    service.addURL(serviceRef);
 
                     session.addURL(address);
 //                    System.out.println("URL: " + address + " - " + age);

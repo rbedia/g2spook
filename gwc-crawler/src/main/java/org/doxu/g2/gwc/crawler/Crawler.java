@@ -17,13 +17,13 @@
  */
 package org.doxu.g2.gwc.crawler;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.doxu.g2.gwc.crawler.model.Host;
+import org.doxu.g2.gwc.crawler.model.HostRef;
 import org.doxu.g2.gwc.crawler.model.Service;
 
 public class Crawler {
@@ -88,26 +88,26 @@ public class Crawler {
 
     private void printStats() {
         System.out.println("Total crawled: " + session.getCrawlCount());
-        List<Service> services = session.getServices();
+        Collection<Service> services = session.getServices().values();
         int working = 0;
-        int connectError = 0;
+        int error = 0;
         for (Service service : services) {
             switch (service.getStatus()) {
                 case WORKING:
                     working++;
                     break;
                 default:
-                    connectError++;
+                    error++;
                     break;
             }
         }
         System.out.println("Working: " + working);
-        System.out.println("Error: " + connectError);
+        System.out.println("Error: " + error);
 
         for (Service service : services) {
             int online = 0;
-            for (Host host : service.getHosts()) {
-                if (host.isOnline()) {
+            for (HostRef host : service.getHosts()) {
+                if (host.getHost().isOnline()) {
                     online++;
                 }
             }

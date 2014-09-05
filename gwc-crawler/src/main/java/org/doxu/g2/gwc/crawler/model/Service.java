@@ -21,31 +21,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Service {
-    private String url;
+    private final String url;
     private String ip;
     private String client;
     private Status status;
 
-    private List<Host> hosts;
-    private List<GWCURL> urls;
+    private final List<HostRef> hosts;
+    private final List<ServiceRef> urls;
 
-    public Service(String url, String ip) {
-        this();
+    public Service(String url) {
         this.url = url;
-        this.ip = ip;
-    }
-
-    public Service() {
         hosts = new ArrayList<>();
         urls = new ArrayList<>();
     }
 
     public String getUrl() {
         return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public String getIp() {
@@ -72,18 +63,18 @@ public class Service {
         this.status = status;
     }
 
-    public List<Host> getHosts() {
+    public List<HostRef> getHosts() {
         return hosts;
     }
 
-    public void addHost(Host host) {
+    public void addHost(HostRef host) {
         hosts.add(host);
     }
-    public List<GWCURL> getUrls() {
+    public List<ServiceRef> getUrls() {
         return urls;
     }
 
-    public void addURL(GWCURL url) {
+    public void addURL(ServiceRef url) {
         urls.add(url);
     }
 
@@ -92,7 +83,7 @@ public class Service {
             return 0;
         }
         int sum = 0;
-        for (Host host : hosts) {
+        for (HostRef host : hosts) {
             sum += host.getAge();
         }
         return sum / hosts.size();
@@ -103,7 +94,7 @@ public class Service {
             return 0;
         }
         int sum = 0;
-        for (GWCURL gwcUrl : urls) {
+        for (ServiceRef gwcUrl : urls) {
             sum += gwcUrl.getAge();
         }
         return sum / urls.size();

@@ -19,24 +19,15 @@ package org.doxu.g2.gwc.crawler.model;
 
 public class Host {
 
-    private String address;
-    private int age;
+    private final String address;
     private boolean online;
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
+    public Host(String address) {
         this.address = address;
     }
 
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
+    public String getAddress() {
+        return address;
     }
 
     public boolean isOnline() {

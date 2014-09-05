@@ -21,21 +21,22 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.concurrent.Callable;
+import org.doxu.g2.gwc.crawler.model.Host;
 import org.doxu.g2.gwc.crawler.model.HostStatus;
 
 public class HostThread implements Callable<HostStatus> {
 
     private static final int TIMEOUT = 250;
 
-    private final String address;
+    private final Host host;
 
     private final String ip;
 
     private final int port;
 
-    public HostThread(String address) {
-        this.address = address;
-        String[] parts = address.split(":");
+    public HostThread(Host host) {
+        this.host = host;
+        String[] parts = host.getAddress().split(":");
         ip = parts[0];
         port = Integer.parseInt(parts[1]);
     }
@@ -44,9 +45,9 @@ public class HostThread implements Callable<HostStatus> {
     public HostStatus call() throws Exception {
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
-            return new HostStatus(address, true);
+            return new HostStatus(host, true);
         } catch (IOException ex) {
-            return new HostStatus(address, false);
+            return new HostStatus(host, false);
         }
     }
 }

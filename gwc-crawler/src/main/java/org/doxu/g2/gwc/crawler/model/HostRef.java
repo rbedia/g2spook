@@ -17,16 +17,21 @@
  */
 package org.doxu.g2.gwc.crawler.model;
 
-public enum Status {
+public class HostRef {
 
-    UNKNOWN,
-    WORKING,
-    LOW_URL_COUNT,
-    LOW_HOST_COUNT,
-    INVALID_URLS,
-    CONNECT_ERROR,
-    HTTP_ERROR,
-    BANNED,
-    BAD_IP,
-    BAD_DNS
+    private final Host host;
+    private final int age;
+
+    public HostRef(Host host, int age) {
+        this.host = host;
+        this.age = age;
+    }
+
+    public Host getHost() {
+        return host;
+    }
+
+    public int getAge() {
+        return age;
+    }
 }

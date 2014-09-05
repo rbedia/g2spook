@@ -17,33 +17,21 @@
  */
 package org.doxu.g2.gwc.crawler.model;
 
-public class GWCURL {
+public class ServiceRef {
 
-    private String address;
-    private int age;
-    private boolean online;
+    private final Service service;
+    private final int age;
 
-    public String getAddress() {
-        return address;
+    public ServiceRef(Service service, int age) {
+        this.service = service;
+        this.age = age;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public Service getService() {
+        return service;
     }
 
     public int getAge() {
         return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public boolean isOnline() {
-        return online;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
     }
 }

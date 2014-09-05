@@ -19,20 +19,20 @@ package org.doxu.g2.gwc.crawler.model;
 
 public class HostStatus {
 
-    private String address;
+    private Host host;
     private boolean online;
 
-    public HostStatus(String address, boolean online) {
-        this.address = address;
+    public HostStatus(Host host, boolean online) {
+        this.host = host;
         this.online = online;
     }
 
-    public String getAddress() {
-        return address;
+    public Host getHost() {
+        return host;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setHost(Host host) {
+        this.host = host;
     }
 
     public boolean isOnline() {
