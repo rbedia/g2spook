@@ -128,12 +128,17 @@ public class CrawlThread implements Runnable {
                     }
                     service.setClient(server);
                 } else if (line.startsWith("h|") || line.startsWith("H|")) {
-                    int index = line.indexOf('|', 2);
+                    int beginIndex = line.indexOf('|', 2);
                     String address;
                     int age;
-                    if (index > 0) {
-                        address = line.substring(2, index);
-                        age = convertToInt(line.substring(index + 1));
+                    if (beginIndex > 0) {
+                        address = line.substring(2, beginIndex);
+                        int endIndex = line.indexOf('|', beginIndex + 1);
+                        if (endIndex > 0) {
+                            age = convertToInt(line.substring(beginIndex + 1, endIndex));
+                        } else {
+                            age = convertToInt(line.substring(beginIndex + 1));
+                        }
                     } else {
                         address = line.substring(2);
                         age = 0;
