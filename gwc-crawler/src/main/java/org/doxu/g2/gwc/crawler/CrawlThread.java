@@ -97,6 +97,7 @@ public class CrawlThread implements Runnable {
             URI uri = new URIBuilder(host)
                     .setParameter("client", "DOXU" + Crawler.VERSION)
                     .setParameter("get", "1")
+                    .setParameter("ping", "1")
                     .setParameter("net", "gnutella2")
                     .build();
             return uri;
@@ -121,8 +122,11 @@ public class CrawlThread implements Runnable {
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("i|pong|") || line.startsWith("I|pong|")) {
                     String server = line.substring(7);
+                    int index = server.indexOf('|');
+                    if (index > 0) {
+                        server = server.substring(0, index);
+                    }
                     service.setClient(server);
-//                    System.out.println("Pong: " + server);
                 } else if (line.startsWith("h|") || line.startsWith("H|")) {
                     int index = line.indexOf('|', 2);
                     String address;
@@ -137,8 +141,6 @@ public class CrawlThread implements Runnable {
                     Host host = session.addHost(address);
                     HostRef hostRef = new HostRef(host, age);
                     service.addHost(hostRef);
-
-//                    System.out.println("Host: " + host + " - " + age);
                 } else if (line.startsWith("u|") || line.startsWith("U|")) {
                     int index = line.indexOf('|', 2);
                     String address;
@@ -155,7 +157,6 @@ public class CrawlThread implements Runnable {
                     service.addURL(serviceRef);
 
                     session.addURL(address);
-//                    System.out.println("URL: " + address + " - " + age);
                 }
             }
         }

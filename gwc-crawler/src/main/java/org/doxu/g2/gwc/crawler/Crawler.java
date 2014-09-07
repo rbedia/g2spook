@@ -29,11 +29,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.doxu.g2.gwc.crawler.model.HostRef;
 import org.doxu.g2.gwc.crawler.model.Service;
+import org.doxu.g2.gwc.crawler.model.ServiceRef;
 
 public class Crawler {
 
     public static final String VERSION = "1.0";
-    public static final int GWC_CRAWLER_THREADS = 5;
+    public static final int GWC_CRAWLER_THREADS = 10;
     public static final int CONNECT_TIMEOUT = 7 * 1000;
     private final CrawlSession session;
 
@@ -110,31 +111,36 @@ public class Crawler {
         int working = 0;
         int error = 0;
         for (Service service : services) {
-            switch (service.getStatus()) {
-                case WORKING:
-                    working++;
-                    break;
-                default:
-                    error++;
-                    break;
+            if (service.isWorking()) {
+                working++;
+            } else {
+                error++;
             }
         }
         System.out.println("Working: " + working);
         System.out.println("Error: " + error);
 
         for (Service service : services) {
-            int online = 0;
+            int hostsOnline = 0;
             for (HostRef host : service.getHosts()) {
                 if (host.getHost().isOnline()) {
-                    online++;
+                    hostsOnline++;
+                }
+            }
+            int urlsOnline = 0;
+            for (ServiceRef serviceRef : service.getUrls()) {
+                if (serviceRef.getService().isWorking()) {
+                    urlsOnline++;
                 }
             }
             int hosts = service.getHosts().size();
+            int urls = service.getUrls().size();
             int deltaAgeHosts = service.getDeltaAgeHosts();
             int deltaAgeUrls = service.getDeltaAgeUrls();
             System.out.println(service.getUrl() + " - " + service.getStatus()
-                    + " - " + online + "/" + hosts + ", " + deltaAgeHosts
-                    + ", " + deltaAgeUrls);
+                    + " - " + service.getClient()
+                    + " - " + hostsOnline + "/" + hosts + ", " + deltaAgeHosts
+                    + " - " + urlsOnline + "/" + urls + ", " + deltaAgeUrls);
         }
     }
 

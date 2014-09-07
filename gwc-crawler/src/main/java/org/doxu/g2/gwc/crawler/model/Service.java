@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Service {
+
     private final String url;
     private String ip;
     private String client;
@@ -55,6 +56,10 @@ public class Service {
         this.client = client;
     }
 
+    public boolean isWorking() {
+        return status == Status.WORKING;
+    }
+
     public Status getStatus() {
         return status;
     }
@@ -70,6 +75,7 @@ public class Service {
     public void addHost(HostRef host) {
         hosts.add(host);
     }
+
     public List<ServiceRef> getUrls() {
         return urls;
     }
