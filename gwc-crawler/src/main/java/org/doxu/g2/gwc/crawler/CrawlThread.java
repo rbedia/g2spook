@@ -39,6 +39,8 @@ import org.doxu.g2.gwc.crawler.model.Status;
 
 public class CrawlThread implements Runnable {
 
+    private static final Logger LOGGER = Logger.getLogger(CrawlThread.class.getName());
+
     private final CrawlSession session;
 
     private final String gwcUrl;
@@ -81,7 +83,7 @@ public class CrawlThread implements Runnable {
                 }
             } catch (IOException ex) {
                 service.setStatus(Status.CONNECT_ERROR);
-                Logger.getLogger(CrawlThread.class.getName()).log(Level.FINE, null, ex);
+                LOGGER.log(Level.FINE, null, ex);
             }
         }
         System.out.println("Service: " + service.getUrl());
@@ -102,7 +104,7 @@ public class CrawlThread implements Runnable {
                     .build();
             return uri;
         } catch (URISyntaxException ex) {
-            Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
             return null;
         }
     }
@@ -120,50 +122,63 @@ public class CrawlThread implements Runnable {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.startsWith("i|pong|") || line.startsWith("I|pong|")) {
-                    String server = line.substring(7);
-                    int index = server.indexOf('|');
-                    if (index > 0) {
-                        server = server.substring(0, index);
+                String[] tokens = line.split("\\|");
+                if (tokens.length > 0) {
+                    switch (tokens[0]) {
+                        case "i":
+                        case "I":
+                            parseInfo(tokens, service);
+                            break;
+                        case "h":
+                        case "H":
+                            parseHost(tokens, service);
+                            break;
+                        case "u":
+                        case "U":
+                            parseUrl(tokens, service);
+                            break;
+                        default:
+                            LOGGER.log(Level.INFO, "Unrecognized line: {0}", line);
+                            break;
                     }
-                    service.setClient(server);
-                } else if (line.startsWith("h|") || line.startsWith("H|")) {
-                    int beginIndex = line.indexOf('|', 2);
-                    String address;
-                    int age;
-                    if (beginIndex > 0) {
-                        address = line.substring(2, beginIndex);
-                        int endIndex = line.indexOf('|', beginIndex + 1);
-                        if (endIndex > 0) {
-                            age = convertToInt(line.substring(beginIndex + 1, endIndex));
-                        } else {
-                            age = convertToInt(line.substring(beginIndex + 1));
-                        }
-                    } else {
-                        address = line.substring(2);
-                        age = 0;
-                    }
-                    Host host = session.addHost(address);
-                    HostRef hostRef = new HostRef(host, age);
-                    service.addHost(hostRef);
-                } else if (line.startsWith("u|") || line.startsWith("U|")) {
-                    int index = line.indexOf('|', 2);
-                    String address;
-                    int age;
-                    if (index > 0) {
-                        address = line.substring(2, index);
-                        age = convertToInt(line.substring(index + 1));
-                    } else {
-                        address = line.substring(2);
-                        age = 0;
-                    }
-                    Service recvService = session.addService(address);
-                    ServiceRef serviceRef = new ServiceRef(recvService, age);
-                    service.addURL(serviceRef);
-
-                    session.addURL(address);
                 }
             }
+        }
+    }
+
+    private void parseInfo(String[] tokens, final Service service) {
+        if (tokens.length > 2 && tokens[1].equalsIgnoreCase("pong")) {
+            String server = tokens[2];
+            service.setClient(server);
+        }
+    }
+
+    private void parseHost(String[] tokens, final Service service) throws NumberFormatException {
+        if (tokens.length > 1) {
+            String address = tokens[1];
+            // TODO validate address is well-formed
+            int age = 0;
+            if (tokens.length > 2) {
+                age = convertToInt(tokens[2]);
+            }
+            Host host = session.addHost(address);
+            HostRef hostRef = new HostRef(host, age);
+            service.addHost(hostRef);
+        }
+    }
+
+    private void parseUrl(String[] tokens, final Service service) throws NumberFormatException {
+        if (tokens.length > 1) {
+            String address = tokens[1];
+            // TODO validate address is well-formed
+            int age = 0;
+            if (tokens.length > 2) {
+                age = convertToInt(tokens[2]);
+            }
+            Service recvService = session.addService(address);
+            ServiceRef serviceRef = new ServiceRef(recvService, age);
+            service.addURL(serviceRef);
+            session.addURL(address);
         }
     }
 
