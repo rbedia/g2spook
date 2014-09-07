@@ -30,6 +30,7 @@ public class Crawler {
 
     public static final String VERSION = "1.0";
     public static final int GWC_CRAWLER_THREADS = 5;
+    public static final int CONNECT_TIMEOUT = 7 * 1000;
     private final CrawlSession session;
 
     private final CountDownLatch crawlCompletedBarrier;
@@ -115,8 +116,8 @@ public class Crawler {
             int deltaAgeHosts = service.getDeltaAgeHosts();
             int deltaAgeUrls = service.getDeltaAgeUrls();
             System.out.println(service.getUrl() + " - " + service.getStatus()
-                    + " - " + online + "/" + hosts + " - " + deltaAgeHosts
-                    + " - " + deltaAgeUrls);
+                    + " - " + online + "/" + hosts + ", " + deltaAgeHosts
+                    + ", " + deltaAgeUrls);
         }
     }
 

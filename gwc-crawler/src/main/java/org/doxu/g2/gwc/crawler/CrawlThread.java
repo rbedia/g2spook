@@ -27,6 +27,7 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -52,7 +53,15 @@ public class CrawlThread implements Runnable {
     @Override
     public void run() {
         // TODO only create one httpclient for the whole application
-        try (CloseableHttpClient httpclient = HttpClients.custom().setUserAgent("doxu/" + Crawler.VERSION).build()) {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(Crawler.CONNECT_TIMEOUT)
+                .setSocketTimeout(Crawler.CONNECT_TIMEOUT)
+                .build();
+        try (CloseableHttpClient httpclient = HttpClients.custom()
+                .setUserAgent("doxu/" + Crawler.VERSION)
+                .setDefaultRequestConfig(requestConfig)
+                .disableAutomaticRetries()
+                .build()) {
             crawlGWC(gwcUrl, httpclient);
         } catch (IOException ex) {
             Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
