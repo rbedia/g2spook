@@ -27,12 +27,10 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.doxu.g2.gwc.crawler.model.ServiceRef;
 import org.doxu.g2.gwc.crawler.model.Host;
 import org.doxu.g2.gwc.crawler.model.HostRef;
@@ -45,27 +43,17 @@ public class CrawlThread implements Runnable {
 
     private final String gwcUrl;
 
-    public CrawlThread(CrawlSession session, String gwcUrl) {
+    private final CloseableHttpClient httpClient;
+
+    public CrawlThread(CrawlSession session, CloseableHttpClient httpClient, String gwcUrl) {
         this.session = session;
+        this.httpClient = httpClient;
         this.gwcUrl = gwcUrl;
     }
 
     @Override
     public void run() {
-        // TODO only create one httpclient for the whole application
-        RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(Crawler.CONNECT_TIMEOUT)
-                .setSocketTimeout(Crawler.CONNECT_TIMEOUT)
-                .build();
-        try (CloseableHttpClient httpclient = HttpClients.custom()
-                .setUserAgent("doxu/" + Crawler.VERSION)
-                .setDefaultRequestConfig(requestConfig)
-                .disableAutomaticRetries()
-                .build()) {
-            crawlGWC(gwcUrl, httpclient);
-        } catch (IOException ex) {
-            Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        crawlGWC(gwcUrl, httpClient);
     }
 
     private void crawlGWC(String gwcUrl, final CloseableHttpClient httpclient) {

@@ -17,12 +17,16 @@
  */
 package org.doxu.g2.gwc.crawler;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.doxu.g2.gwc.crawler.model.HostRef;
 import org.doxu.g2.gwc.crawler.model.Service;
 
@@ -44,27 +48,40 @@ public class Crawler {
         String startUrl = "http://cache.trillinux.org/g2/bazooka.php";
         session.addURL(startUrl);
 
-        CrawlerThreadPoolExecutor executor = new CrawlerThreadPoolExecutor(
-                GWC_CRAWLER_THREADS, GWC_CRAWLER_THREADS,
-                0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>());
-        executor.setListener(new IdleListener() {
-            @Override
-            public void idle() {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(Crawler.CONNECT_TIMEOUT)
+                .setSocketTimeout(Crawler.CONNECT_TIMEOUT)
+                .build();
+        try (CloseableHttpClient httpClient = HttpClients.custom()
+                .setUserAgent("doxu/" + Crawler.VERSION)
+                .setDefaultRequestConfig(requestConfig)
+                .disableAutomaticRetries()
+                .build()) {
+            CrawlerThreadPoolExecutor executor = new CrawlerThreadPoolExecutor(
+                    GWC_CRAWLER_THREADS, GWC_CRAWLER_THREADS,
+                    0L, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<Runnable>());
+            executor.setListener(new IdleListener() {
+                @Override
+                public void idle() {
                 // If the thread pool is idle and the queue of GWCs to crawl is empty
-                // the crawl of GWCs is complete
-                if (session.peek() == null) {
-                    crawlCompletedBarrier.countDown();
+                    // the crawl of GWCs is complete
+                    if (session.peek() == null) {
+                        crawlCompletedBarrier.countDown();
+                    }
                 }
+            });
+
+            CrawlThreadFactory factory = CrawlThreadFactory.newFactory(session, httpClient);
+            runQueueProcessor(factory, executor);
+
+            executor.shutdown();
+            try {
+                executor.awaitTermination(30, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
             }
-        });
-
-        runQueueProcessor(executor);
-
-        executor.shutdown();
-        try {
-            executor.awaitTermination(30, TimeUnit.SECONDS);
-        } catch (InterruptedException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -74,8 +91,8 @@ public class Crawler {
         printStats();
     }
 
-    private void runQueueProcessor(CrawlerThreadPoolExecutor executor) {
-        Thread producerThread = new QueueProcessorThread(session, executor);
+    private void runQueueProcessor(CrawlThreadFactory factory, CrawlerThreadPoolExecutor executor) {
+        Thread producerThread = new QueueProcessorThread(session, factory, executor);
         producerThread.start();
 
         try {

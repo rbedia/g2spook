@@ -22,11 +22,14 @@ import java.util.concurrent.ExecutorService;
 public class QueueProcessorThread extends Thread {
 
     private final CrawlSession session;
+    
+    private final CrawlThreadFactory factory;
 
     private final ExecutorService executor;
 
-    public QueueProcessorThread(CrawlSession session, ExecutorService executor) {
+    public QueueProcessorThread(CrawlSession session, CrawlThreadFactory factory, ExecutorService executor) {
         this.session = session;
+        this.factory = factory;
         this.executor = executor;
     }
 
@@ -35,7 +38,7 @@ public class QueueProcessorThread extends Thread {
         try {
             while (true) {
                 String gwcUrl = session.take();
-                executor.execute(new CrawlThread(session, gwcUrl));
+                executor.execute(factory.createThread(gwcUrl));
             }
         } catch (InterruptedException ex) {
             // terminate
