@@ -17,15 +17,24 @@
  */
 package org.doxu.g2.gwc.crawler;
 
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import org.doxu.g2.gwc.crawler.model.Host;
 import org.doxu.g2.gwc.crawler.model.Service;
+import org.doxu.g2.gwc.crawler.xml.ObjectFactory;
+import org.doxu.g2.gwc.crawler.xml.Services;
 
 public class CrawlSession {
 
@@ -112,5 +121,31 @@ public class CrawlSession {
 
     public Map<String, Host> getHosts() {
         return hosts;
+    }
+
+    public String toXML() {
+        ObjectFactory factory = new ObjectFactory();
+        Services xmlServices = new Services();
+        List<org.doxu.g2.gwc.crawler.xml.Service> serviceList = xmlServices.getService();
+        for (Service service : services.values()) {
+            org.doxu.g2.gwc.crawler.xml.Service xmlService = new org.doxu.g2.gwc.crawler.xml.Service();
+            xmlService.setUrl(service.getUrl());
+            xmlService.setIp(service.getIp());
+            xmlService.setClient(service.getClient());
+            xmlService.setStatus(service.getStatus().toString());
+            serviceList.add(xmlService);
+        }
+
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance("org.doxu.g2.gwc.crawler.xml");
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            StringWriter out = new StringWriter();
+            jaxbMarshaller.marshal(factory.createServices(xmlServices), out);
+            return out.toString();
+        } catch (JAXBException ex) {
+            Logger.getLogger(CrawlSession.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
     }
 }
