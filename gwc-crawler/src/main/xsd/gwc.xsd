@@ -2,7 +2,7 @@
     <xs:element name="services" type="Services"/>
     <xs:complexType name="Services">
         <xs:sequence>
-            <xs:element name="service" type="Service" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="Service" name="service" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute type="xs:dateTime" name="timestamp"/>
         <xs:attribute type="xs:string" name="network"/>
@@ -14,23 +14,24 @@
             <xs:element type="xs:string" name="ip" minOccurs="0"/>
             <xs:element type="xs:string" name="network"/>
             <xs:element type="xs:string" name="delta_age" minOccurs="0"/>
-            <xs:element name="hosts" type="Hosts"/>
+            <xs:element type="Hosts"     name="hosts"/>
             <xs:element type="xs:string" name="urls"/>
         </xs:sequence>
         <xs:attribute type="xs:float" name="score" use="optional"/>
         <xs:attribute type="xs:string" name="status" use="optional"/>
         <xs:attribute type="xs:dateTime" name="timestamp" use="optional"/>
-        <xs:attribute type="xs:byte" name="failures" use="optional"/>
+        <xs:attribute type="xs:int" name="failures" use="optional"/>
     </xs:complexType>
-    <xs:complexType name="Hosts" mixed="true">
+    <xs:complexType name="Hosts">
         <xs:sequence>
             <xs:element name="host" type="Host" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
+        <xs:attribute type="xs:string" name="summary" use="optional"/>
     </xs:complexType>
     <xs:complexType name="Host">
         <xs:sequence>
             <xs:element type="xs:string" name="ip"/>
-            <xs:element type="xs:float" name="port"/>
+            <xs:element type="xs:int" name="port"/>
             <xs:element type="xs:string" name="client"/>
         </xs:sequence>
         <xs:attribute type="xs:byte" name="online" use="optional"/>

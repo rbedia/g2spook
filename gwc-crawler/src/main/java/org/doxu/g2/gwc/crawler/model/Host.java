@@ -30,6 +30,14 @@ public class Host {
         return address;
     }
 
+    public String getIp() {
+        return address.split(":")[0];
+    }
+
+    public int getPort() {
+        return Integer.parseInt(address.split(":")[1]);
+    }
+
     public boolean isOnline() {
         return online;
     }

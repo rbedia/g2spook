@@ -32,7 +32,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.doxu.g2.gwc.crawler.model.Host;
+import org.doxu.g2.gwc.crawler.model.HostRef;
 import org.doxu.g2.gwc.crawler.model.Service;
+import org.doxu.g2.gwc.crawler.model.ServiceRef;
+import org.doxu.g2.gwc.crawler.xml.Hosts;
 import org.doxu.g2.gwc.crawler.xml.ObjectFactory;
 import org.doxu.g2.gwc.crawler.xml.Services;
 
@@ -133,6 +136,35 @@ public class CrawlSession {
             xmlService.setIp(service.getIp());
             xmlService.setClient(service.getClient());
             xmlService.setStatus(service.getStatus().toString());
+            xmlService.setHosts(new Hosts());
+            int onlineHosts = 0;
+            for(HostRef hostRef : service.getHosts()) {
+                org.doxu.g2.gwc.crawler.xml.Host xmlHost = new org.doxu.g2.gwc.crawler.xml.Host();
+                xmlHost.setAge(hostRef.getAge());
+                xmlHost.setOnline((byte) (hostRef.getHost().isOnline() ? 1 : 0));
+                xmlHost.setIp(hostRef.getHost().getIp());
+                xmlHost.setPort(hostRef.getHost().getPort());
+                xmlService.getHosts().getHost().add(xmlHost);
+                if (hostRef.getHost().isOnline()) {
+                    onlineHosts++;
+                }
+            }
+            int hostCount = service.getHosts().size();
+            if (hostCount > 0) {
+                xmlService.getHosts().setSummary(String.format("%d/%d (%1.0f%%)", onlineHosts, hostCount, onlineHosts / (float) hostCount * 100.0));
+            }
+            int onlineUrls = 0;
+            for (ServiceRef serviceRef : service.getUrls()) {
+                if (serviceRef.getService().isWorking()) {
+                    onlineUrls++;
+                }
+            }
+            int urlCount = service.getUrls().size();
+            if (urlCount > 0) {
+                xmlService.setUrls(String.format("%d/%d (%1.0f%%)", onlineUrls, urlCount, onlineUrls / (float) urlCount * 100.0));
+            } else {
+                xmlService.setUrls("0");
+            }
             serviceList.add(xmlService);
         }
 
