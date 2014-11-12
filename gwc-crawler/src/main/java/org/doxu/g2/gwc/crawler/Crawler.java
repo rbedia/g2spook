@@ -122,18 +122,8 @@ public class Crawler {
         System.out.println("Error: " + error);
 
         for (Service service : services) {
-            int hostsOnline = 0;
-            for (HostRef host : service.getHosts()) {
-                if (host.getHost().isOnline()) {
-                    hostsOnline++;
-                }
-            }
-            int urlsOnline = 0;
-            for (ServiceRef serviceRef : service.getUrls()) {
-                if (serviceRef.getService().isWorking()) {
-                    urlsOnline++;
-                }
-            }
+            int hostsOnline = service.getOnlineHosts().size();
+            int urlsOnline = service.getWorkingUrls().size();
             int hosts = service.getHosts().size();
             int urls = service.getUrls().size();
             int deltaAgeHosts = service.getDeltaAgeHosts();

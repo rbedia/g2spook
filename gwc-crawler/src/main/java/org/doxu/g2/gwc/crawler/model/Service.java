@@ -107,6 +107,26 @@ public class Service {
         return sum / urls.size();
     }
 
+    public List<HostRef> getOnlineHosts() {
+        List<HostRef> online = new ArrayList<>();
+        for (HostRef host : hosts) {
+            if (host.getHost().isOnline()) {
+                online.add(host);
+            }
+        }
+        return online;
+    }
+
+    public List<ServiceRef> getWorkingUrls() {
+        List<ServiceRef> online = new ArrayList<>();
+        for (ServiceRef service : urls) {
+            if (service.getService().isWorking()) {
+                online.add(service);
+            }
+        }
+        return online;
+    }
+
     public org.doxu.g2.gwc.crawler.xml.Service toXML() {
         org.doxu.g2.gwc.crawler.xml.Service xmlService = new org.doxu.g2.gwc.crawler.xml.Service();
         xmlService.setUrl(url);
@@ -114,24 +134,16 @@ public class Service {
         xmlService.setClient(client);
         xmlService.setStatus(status.toString());
         xmlService.setHosts(new Hosts());
-        int onlineHosts = 0;
         for (HostRef hostRef : hosts) {
             org.doxu.g2.gwc.crawler.xml.Host xmlHost = hostRef.toXML();
             xmlService.getHosts().getHost().add(xmlHost);
-            if (hostRef.getHost().isOnline()) {
-                onlineHosts++;
-            }
         }
+        int onlineHosts = getOnlineHosts().size();
         int hostCount = hosts.size();
         if (hostCount > 0) {
             xmlService.getHosts().setSummary(String.format("%d/%d (%1.0f%%)", onlineHosts, hostCount, onlineHosts / (float) hostCount * 100.0));
         }
-        int onlineUrls = 0;
-        for (ServiceRef serviceRef : urls) {
-            if (serviceRef.getService().isWorking()) {
-                onlineUrls++;
-            }
-        }
+        int onlineUrls = getWorkingUrls().size();
         int urlCount = urls.size();
         if (urlCount > 0) {
             xmlService.setUrls(String.format("%d/%d (%1.0f%%)", onlineUrls, urlCount, onlineUrls / (float) urlCount * 100.0));
