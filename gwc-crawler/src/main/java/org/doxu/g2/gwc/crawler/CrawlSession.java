@@ -131,40 +131,7 @@ public class CrawlSession {
         Services xmlServices = new Services();
         List<org.doxu.g2.gwc.crawler.xml.Service> serviceList = xmlServices.getService();
         for (Service service : services.values()) {
-            org.doxu.g2.gwc.crawler.xml.Service xmlService = new org.doxu.g2.gwc.crawler.xml.Service();
-            xmlService.setUrl(service.getUrl());
-            xmlService.setIp(service.getIp());
-            xmlService.setClient(service.getClient());
-            xmlService.setStatus(service.getStatus().toString());
-            xmlService.setHosts(new Hosts());
-            int onlineHosts = 0;
-            for(HostRef hostRef : service.getHosts()) {
-                org.doxu.g2.gwc.crawler.xml.Host xmlHost = new org.doxu.g2.gwc.crawler.xml.Host();
-                xmlHost.setAge(hostRef.getAge());
-                xmlHost.setOnline((byte) (hostRef.getHost().isOnline() ? 1 : 0));
-                xmlHost.setIp(hostRef.getHost().getIp());
-                xmlHost.setPort(hostRef.getHost().getPort());
-                xmlService.getHosts().getHost().add(xmlHost);
-                if (hostRef.getHost().isOnline()) {
-                    onlineHosts++;
-                }
-            }
-            int hostCount = service.getHosts().size();
-            if (hostCount > 0) {
-                xmlService.getHosts().setSummary(String.format("%d/%d (%1.0f%%)", onlineHosts, hostCount, onlineHosts / (float) hostCount * 100.0));
-            }
-            int onlineUrls = 0;
-            for (ServiceRef serviceRef : service.getUrls()) {
-                if (serviceRef.getService().isWorking()) {
-                    onlineUrls++;
-                }
-            }
-            int urlCount = service.getUrls().size();
-            if (urlCount > 0) {
-                xmlService.setUrls(String.format("%d/%d (%1.0f%%)", onlineUrls, urlCount, onlineUrls / (float) urlCount * 100.0));
-            } else {
-                xmlService.setUrls("0");
-            }
+            org.doxu.g2.gwc.crawler.xml.Service xmlService = service.toXML();
             serviceList.add(xmlService);
         }
 

@@ -34,4 +34,13 @@ public class HostRef {
     public int getAge() {
         return age;
     }
+
+    public org.doxu.g2.gwc.crawler.xml.Host toXML() {
+        org.doxu.g2.gwc.crawler.xml.Host xmlHost = new org.doxu.g2.gwc.crawler.xml.Host();
+        xmlHost.setAge(age);
+        xmlHost.setOnline((byte) (host.isOnline() ? 1 : 0));
+        xmlHost.setIp(host.getIp());
+        xmlHost.setPort(host.getPort());
+        return xmlHost;
+    }
 }
