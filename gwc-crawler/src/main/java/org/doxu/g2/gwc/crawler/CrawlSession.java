@@ -32,10 +32,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.doxu.g2.gwc.crawler.model.Host;
-import org.doxu.g2.gwc.crawler.model.HostRef;
 import org.doxu.g2.gwc.crawler.model.Service;
-import org.doxu.g2.gwc.crawler.model.ServiceRef;
-import org.doxu.g2.gwc.crawler.xml.Hosts;
 import org.doxu.g2.gwc.crawler.xml.ObjectFactory;
 import org.doxu.g2.gwc.crawler.xml.Services;
 
