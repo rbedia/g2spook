@@ -27,9 +27,7 @@ import java.util.logging.Logger;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.doxu.g2.gwc.crawler.model.HostRef;
 import org.doxu.g2.gwc.crawler.model.Service;
-import org.doxu.g2.gwc.crawler.model.ServiceRef;
 
 public class Crawler {
 
