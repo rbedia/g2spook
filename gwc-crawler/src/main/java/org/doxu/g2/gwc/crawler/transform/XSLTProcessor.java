@@ -31,20 +31,9 @@ import net.sf.saxon.s9api.XsltTransformer;
 
 public class XSLTProcessor {
 
-    public static void main(String[] args) throws SaxonApiException, IOException {
-        File xml = new File("C:/gwc/g2_services.xml");
-
-        Processor proc = new Processor(false);
-
-        File servicesHtml = new File("C:/gwc/g2_services.html");
-        transform(proc, "services.xsl", xml, servicesHtml);
-
-        File discoveryHtml = new File("C:/gwc/g2_discovery.html");
-        transform(proc, "discovery.xsl", xml, discoveryHtml);
-
-        File storeTxt = new File("C:/gwc/store.txt");
-        transform(proc, "store.xsl", xml, storeTxt);
-    }
+    public static final String SERVICES_XSL = "services.xsl";
+    public static final String DISCOVERY_XSL = "discovery.xsl";
+    public static final String STORE_XSL = "store.xsl";
 
     public static void transform(Processor proc, String xsltName, File xml, File html) throws SaxonApiException, IOException {
         try (InputStream xslt = XSLTProcessor.class.getResourceAsStream(xsltName)) {

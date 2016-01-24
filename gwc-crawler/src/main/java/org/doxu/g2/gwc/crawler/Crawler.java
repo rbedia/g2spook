@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Rafael Bedia
+ * Copyright 2016 Rafael Bedia
  *
  * This file is part of g2spook.
  *
@@ -32,33 +32,31 @@ import net.sf.saxon.s9api.SaxonApiException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import static org.doxu.g2.gwc.crawler.transform.XSLTProcessor.transform;
 import org.doxu.g2.gwc.crawler.model.Service;
+import org.doxu.g2.gwc.crawler.transform.XSLTProcessor;
 
 public class Crawler {
 
-    public static final String VERSION = "1.0";
     public static final int GWC_CRAWLER_THREADS = 10;
     public static final int CONNECT_TIMEOUT = 7 * 1000;
+
     private final CrawlSession session;
 
     private final CountDownLatch crawlCompletedBarrier;
 
-    public Crawler() {
+    public Crawler(String startUrl) {
         session = new CrawlSession();
+        session.addURL(startUrl);
         crawlCompletedBarrier = new CountDownLatch(1);
     }
 
-    public void start() {
-        String startUrl = "http://cache.trillinux.org/g2/bazooka.php";
-        session.addURL(startUrl);
-
+    public void crawl() {
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(Crawler.CONNECT_TIMEOUT)
                 .setSocketTimeout(Crawler.CONNECT_TIMEOUT)
                 .build();
         try (CloseableHttpClient httpClient = HttpClients.custom()
-                .setUserAgent("doxu/" + Crawler.VERSION)
+                .setUserAgent("doxu/" + AppInfo.VERSION)
                 .setDefaultRequestConfig(requestConfig)
                 .disableAutomaticRetries()
                 .build()) {
@@ -92,35 +90,6 @@ public class Crawler {
 
         HostChecker hostChecker = new HostChecker(session);
         hostChecker.start();
-
-        printStats();
-        writeOutput();
-    }
-
-    public void writeOutput() {
-        try {
-//            System.out.println(session.toXML());
-            File outputDir = new File("target");
-            if (!outputDir.isDirectory()) {
-                outputDir = new File(".");
-            }
-
-            File xml = new File(outputDir, "g2_services.xml");
-            session.toXMLFile(xml);
-
-            Processor proc = new Processor(false);
-
-            File servicesHtml = new File(outputDir, "g2_services.html");
-            transform(proc, "services.xsl", xml, servicesHtml);
-
-            File discoveryHtml = new File(outputDir, "g2_discovery.html");
-            transform(proc, "discovery.xsl", xml, discoveryHtml);
-
-            File storeTxt = new File(outputDir, "store.txt");
-            transform(proc, "store.xsl", xml, storeTxt);
-        } catch (DatatypeConfigurationException | SaxonApiException | IOException | JAXBException ex) {
-            Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     private void runQueueProcessor(CrawlThreadFactory factory, CrawlerThreadPoolExecutor executor) {
@@ -136,7 +105,36 @@ public class Crawler {
         producerThread.interrupt();
     }
 
-    private void printStats() {
+    public void writeOutput(File outputDir) {
+        try {
+            if (!outputDir.exists()) {
+                boolean success = outputDir.mkdirs();
+                if (!success) {
+                    throw new IOException("Failed to create output directory: " + outputDir.getPath());
+                }
+            } else if (!outputDir.isDirectory()) {
+                throw new IllegalArgumentException(outputDir.getPath() + " must be a directory.");
+            }
+            
+            File xml = new File(outputDir, OutputFiles.get(OutputFiles.Id.XML).local);
+            session.toXMLFile(xml);
+
+            Processor proc = new Processor(false);
+
+            File servicesHtml = new File(outputDir, OutputFiles.get(OutputFiles.Id.SERVICES).local);
+            XSLTProcessor.transform(proc, XSLTProcessor.SERVICES_XSL, xml, servicesHtml);
+
+            File discoveryHtml = new File(outputDir, OutputFiles.get(OutputFiles.Id.DISCOVERY).local);
+            XSLTProcessor.transform(proc, XSLTProcessor.DISCOVERY_XSL, xml, discoveryHtml);
+
+            File storeTxt = new File(outputDir, OutputFiles.get(OutputFiles.Id.STORE).local);
+            XSLTProcessor.transform(proc, XSLTProcessor.STORE_XSL, xml, storeTxt);
+        } catch (DatatypeConfigurationException | SaxonApiException | IOException | JAXBException ex) {
+            Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void printStats() {
         System.out.println("Total crawled: " + session.getCrawlCount());
         Collection<Service> services = session.getServices().values();
         int working = 0;
@@ -166,8 +164,15 @@ public class Crawler {
     }
 
     public static void main(String[] args) {
-        Crawler crawler = new Crawler();
-        crawler.start();
+        Crawler crawler = new Crawler("http://cache.trillinux.org/g2/bazooka.php");
+        crawler.crawl();
+
+        crawler.printStats();
+        File outputDir = new File("target");
+        if (!outputDir.isDirectory()) {
+            outputDir = new File(".");
+        }
+        crawler.writeOutput(outputDir);
     }
 
 }

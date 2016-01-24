@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Rafael Bedia
+ * Copyright 2016 Rafael Bedia
  *
  * This file is part of g2spook.
  *
@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -62,6 +60,9 @@ public class CrawlSession {
     }
 
     public void addURL(String url) {
+        if (url == null || url.isEmpty()) {
+            return;
+        }
         synchronized (mutex) {
             if (!crawled.contains(url)) {
                 queue.add(url);

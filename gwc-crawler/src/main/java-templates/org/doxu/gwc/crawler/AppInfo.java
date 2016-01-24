@@ -15,34 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * g2spook. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.doxu.g2.gwc.crawler.model;
+package org.doxu.g2.gwc.crawler;
 
-public class Host {
-
-    private final String address;
-    private boolean online;
-
-    public Host(String address) {
-        this.address = address;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getIp() {
-        return address.split(":")[0];
-    }
-
-    public int getPort() {
-        return Integer.parseInt(address.split(":")[1]);
-    }
-
-    public boolean isOnline() {
-        return online;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
-    }
+public class AppInfo {
+    public static final String VERSION = "${project.version}";
 }

@@ -15,34 +15,23 @@
  * You should have received a copy of the GNU General Public License along with
  * g2spook. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.doxu.g2.gwc.crawler.model;
+package org.doxu.g2.gwc.crawler;
 
-public class Host {
+/**
+ * A resource created by the crawler.
+ */
+public class CrawlerFile {
 
-    private final String address;
-    private boolean online;
+    public final String local;
+    public final String remote;
 
-    public Host(String address) {
-        this.address = address;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getIp() {
-        return address.split(":")[0];
-    }
-
-    public int getPort() {
-        return Integer.parseInt(address.split(":")[1]);
-    }
-
-    public boolean isOnline() {
-        return online;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
+    /**
+     *
+     * @param local Local file name
+     * @param remote Remote file name
+     */
+    public CrawlerFile(String local, String remote) {
+        this.local = local;
+        this.remote = remote;
     }
 }

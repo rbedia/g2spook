@@ -15,34 +15,28 @@
  * You should have received a copy of the GNU General Public License along with
  * g2spook. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.doxu.g2.gwc.crawler.model;
+package org.doxu.g2.gwc;
 
-public class Host {
+import com.beust.jcommander.Parameter;
+import java.io.File;
 
-    private final String address;
-    private boolean online;
+public class CommandMain {
 
-    public Host(String address) {
-        this.address = address;
+    @Parameter(names = {"-v", "-verbose"})
+    private boolean verbose;
+
+    @Parameter(names = {"-d", "--directory"},
+            description = "Directory to write files",
+            converter = FileConverter.class,
+            required = true)
+    private File directory;
+
+    public boolean isVerbose() {
+        return verbose;
     }
 
-    public String getAddress() {
-        return address;
+    public File getDirectory() {
+        return directory;
     }
 
-    public String getIp() {
-        return address.split(":")[0];
-    }
-
-    public int getPort() {
-        return Integer.parseInt(address.split(":")[1]);
-    }
-
-    public boolean isOnline() {
-        return online;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
-    }
 }

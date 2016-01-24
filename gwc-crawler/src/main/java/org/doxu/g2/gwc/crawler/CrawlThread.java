@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Rafael Bedia
+ * Copyright 2016 Rafael Bedia
  *
  * This file is part of g2spook.
  *
@@ -97,7 +97,7 @@ public class CrawlThread implements Runnable {
     private URI basicGet(String host) {
         try {
             URI uri = new URIBuilder(host)
-                    .setParameter("client", "DOXU" + Crawler.VERSION)
+                    .setParameter("client", "DOXU" + AppInfo.VERSION)
                     .setParameter("get", "1")
                     .setParameter("ping", "1")
                     .setParameter("net", "gnutella2")

@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Rafael Bedia
+ * Copyright 2016 Rafael Bedia
  *
  * This file is part of g2spook.
  *
