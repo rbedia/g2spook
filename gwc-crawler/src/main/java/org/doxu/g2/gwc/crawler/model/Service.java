@@ -18,7 +18,11 @@
 package org.doxu.g2.gwc.crawler.model;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import org.doxu.g2.gwc.crawler.xml.Hosts;
 
 public class Service {
@@ -27,12 +31,14 @@ public class Service {
     private String ip;
     private String client;
     private Status status;
+    private Date timestamp;
 
     private final List<HostRef> hosts;
     private final List<ServiceRef> urls;
 
     public Service(String url) {
         this.url = url;
+        timestamp = new Date();
         hosts = new ArrayList<>();
         urls = new ArrayList<>();
     }
@@ -67,6 +73,14 @@ public class Service {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
     public List<HostRef> getHosts() {
@@ -127,29 +141,77 @@ public class Service {
         return online;
     }
 
-    public org.doxu.g2.gwc.crawler.xml.Service toXML() {
+    public double getScore() {
+        double score = 0;
+        double totalUrls = urls.size();
+        if (totalUrls > 1) {
+            double workingUrls = getWorkingUrls().size();
+            score += (1 / Math.log10(totalUrls)) * workingUrls * (workingUrls / totalUrls);
+        }
+        double totalHosts = hosts.size();
+        if (totalHosts > 1) {
+            double workingHosts = getOnlineHosts().size();
+            score += (1 / Math.log10(totalHosts)) * workingHosts * (workingHosts / totalHosts);
+        }
+        return score;
+    }
+
+    public long getDeltaAge() {
+        int hostCount = hosts.size();
+        if (hostCount > 0) {
+            long minAge = hosts.get(0).getAge();
+            long maxAge = hosts.get(0).getAge();
+            for (HostRef host : hosts) {
+                long hostAge = host.getAge();
+                if (hostAge < minAge) {
+                    minAge = hostAge;
+                }
+                if (hostAge > maxAge) {
+                    maxAge = hostAge;
+                }
+            }
+            return (maxAge - minAge) / hostCount;
+        }
+        return Long.MIN_VALUE;
+    }
+
+    public org.doxu.g2.gwc.crawler.xml.Service toXML() throws DatatypeConfigurationException {
         org.doxu.g2.gwc.crawler.xml.Service xmlService = new org.doxu.g2.gwc.crawler.xml.Service();
         xmlService.setUrl(url);
         xmlService.setIp(ip);
         xmlService.setClient(client);
+        long deltaAge = getDeltaAge();
+        if (deltaAge != Long.MIN_VALUE) {
+            xmlService.setDeltaAge(Long.toString(deltaAge));
+        } else {
+            xmlService.setDeltaAge("");
+        }
+        GregorianCalendar c = new GregorianCalendar();
+        c.setTime(timestamp);
+        xmlService.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(c));
         xmlService.setStatus(status.toString());
         xmlService.setHosts(new Hosts());
         for (HostRef hostRef : hosts) {
             org.doxu.g2.gwc.crawler.xml.Host xmlHost = hostRef.toXML();
-            xmlService.getHosts().getHost().add(xmlHost);
+            xmlService.getHosts().getContent().add(xmlHost);
         }
         int onlineHosts = getOnlineHosts().size();
         int hostCount = hosts.size();
         if (hostCount > 0) {
-            xmlService.getHosts().setSummary(String.format("%d/%d (%1.0f%%)", onlineHosts, hostCount, onlineHosts / (float) hostCount * 100.0));
+            String hostSummary = String.format("%d/%d (%1.0f%%)", onlineHosts, hostCount, onlineHosts / (float) hostCount * 100.0);
+            // Add the summary to the beginning so it is picked up by the
+            // stylesheet.
+            xmlService.getHosts().getContent().add(0, hostSummary);
         }
         int onlineUrls = getWorkingUrls().size();
         int urlCount = urls.size();
         if (urlCount > 0) {
-            xmlService.setUrls(String.format("%d/%d (%1.0f%%)", onlineUrls, urlCount, onlineUrls / (float) urlCount * 100.0));
+            String urlSummary = String.format("%d/%d (%1.0f%%)", onlineUrls, urlCount, onlineUrls / (float) urlCount * 100.0);
+            xmlService.setUrls(urlSummary);
         } else {
             xmlService.setUrls("0");
         }
+        xmlService.setScore(getScore());
         return xmlService;
     }
 }

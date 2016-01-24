@@ -17,6 +17,7 @@
  */
 package org.doxu.g2.gwc.crawler;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
@@ -24,9 +25,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import static org.doxu.g2.gwc.crawler.transform.XSLTProcessor.transform;
 import org.doxu.g2.gwc.crawler.model.Service;
 
 public class Crawler {
@@ -63,7 +69,7 @@ public class Crawler {
             executor.setListener(new IdleListener() {
                 @Override
                 public void idle() {
-                // If the thread pool is idle and the queue of GWCs to crawl is empty
+                    // If the thread pool is idle and the queue of GWCs to crawl is empty
                     // the crawl of GWCs is complete
                     if (session.peek() == null) {
                         crawlCompletedBarrier.countDown();
@@ -88,7 +94,33 @@ public class Crawler {
         hostChecker.start();
 
         printStats();
-        System.out.println(session.toXML());
+        writeOutput();
+    }
+
+    public void writeOutput() {
+        try {
+//            System.out.println(session.toXML());
+            File outputDir = new File("target");
+            if (!outputDir.isDirectory()) {
+                outputDir = new File(".");
+            }
+
+            File xml = new File(outputDir, "g2_services.xml");
+            session.toXMLFile(xml);
+
+            Processor proc = new Processor(false);
+
+            File servicesHtml = new File(outputDir, "g2_services.html");
+            transform(proc, "services.xsl", xml, servicesHtml);
+
+            File discoveryHtml = new File(outputDir, "g2_discovery.html");
+            transform(proc, "discovery.xsl", xml, discoveryHtml);
+
+            File storeTxt = new File(outputDir, "store.txt");
+            transform(proc, "store.xsl", xml, storeTxt);
+        } catch (DatatypeConfigurationException | SaxonApiException | IOException | JAXBException ex) {
+            Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void runQueueProcessor(CrawlThreadFactory factory, CrawlerThreadPoolExecutor executor) {

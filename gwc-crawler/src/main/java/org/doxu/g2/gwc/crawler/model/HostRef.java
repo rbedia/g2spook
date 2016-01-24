@@ -20,9 +20,9 @@ package org.doxu.g2.gwc.crawler.model;
 public class HostRef {
 
     private final Host host;
-    private final int age;
+    private final long age;
 
-    public HostRef(Host host, int age) {
+    public HostRef(Host host, long age) {
         this.host = host;
         this.age = age;
     }
@@ -31,14 +31,14 @@ public class HostRef {
         return host;
     }
 
-    public int getAge() {
+    public long getAge() {
         return age;
     }
 
     public org.doxu.g2.gwc.crawler.xml.Host toXML() {
         org.doxu.g2.gwc.crawler.xml.Host xmlHost = new org.doxu.g2.gwc.crawler.xml.Host();
         xmlHost.setAge(age);
-        xmlHost.setOnline((byte) (host.isOnline() ? 1 : 0));
+        xmlHost.setOnline(host.isOnline());
         xmlHost.setIp(host.getIp());
         xmlHost.setPort(host.getPort());
         return xmlHost;

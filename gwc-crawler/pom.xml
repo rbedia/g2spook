@@ -23,6 +23,11 @@
             <version>2.4</version>
         </dependency>
         <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
+            <version>9.7.0-2</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>18.0</version>
@@ -43,7 +48,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <packageName>org.doxu.g2.gwc.crawler.xml</packageName> <!-- The name of your generated source package -->
+                    <packageName>org.doxu.g2.gwc.crawler.xml</packageName>
                 </configuration>
             </plugin>
         </plugins>

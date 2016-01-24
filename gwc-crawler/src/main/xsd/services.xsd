@@ -1,0 +1,102 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <!-- definition of attributes -->
+  <xs:attribute name="age" type="xs:unsignedInt" />
+  <xs:attribute name="failures" type="xs:unsignedInt" />
+  <xs:attribute name="network" type="network" />
+  <xs:attribute name="online" type="xs:boolean" />
+  <xs:attribute name="score" type="xs:double" />
+  <xs:attribute name="status" type="xs:string" />
+  <xs:attribute name="timestamp" type="xs:dateTime" />
+  <!-- definition of elements -->
+  <xs:element name="client" type="xs:string" />
+  <xs:element name="delta_age">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:unsignedInt emptyString" />
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="host">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ip" />
+        <xs:element ref="port" />
+        <xs:element ref="client" minOccurs="0" />
+      </xs:sequence>
+      <xs:attribute ref="age" />
+      <xs:attribute ref="online" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="hosts">
+    <xs:complexType mixed="true">
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="host" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ip">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:whiteSpace value="collapse" />
+        <xs:pattern value="([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="network" type="network" />
+  <xs:element name="port">
+    <xs:simpleType>
+      <xs:restriction base="xs:positiveInteger">
+        <xs:minInclusive value="1" />
+        <xs:maxInclusive value="65535" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="service">
+    <xs:complexType>
+      <xs:all minOccurs="1" maxOccurs="1">
+        <xs:element ref="url" />
+        <xs:element ref="client" minOccurs="0" />
+        <xs:element ref="ip" minOccurs="0" />
+        <xs:element ref="network" />
+        <xs:element ref="delta_age" minOccurs="0" />
+        <xs:element ref="hosts" />
+        <xs:element ref="urls" />
+      </xs:all>
+      <xs:attribute ref="failures" />
+      <xs:attribute ref="score" />
+      <xs:attribute ref="status" />      
+      <xs:attribute ref="timestamp" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="services">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="service" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute ref="network" use="required" />
+      <xs:attribute ref="timestamp" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="url">
+    <xs:simpleType>
+      <xs:restriction base="xs:anyURI">
+        <xs:whiteSpace value="collapse" />
+        <xs:pattern value="http://.+" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="urls" type="xs:string" />
+  <!-- type definitions -->
+  <xs:simpleType name="emptyString">
+    <xs:restriction base="xs:string">
+      <xs:whiteSpace value="collapse"/>
+      <xs:enumeration value="" />
+      <xs:enumeration value=" " />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="network">
+    <xs:restriction base="xs:string">
+      <xs:whiteSpace value="collapse" />
+      <xs:enumeration value="Gnutella" />
+      <xs:enumeration value="Gnutella2" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

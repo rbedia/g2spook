@@ -17,8 +17,13 @@
  */
 package org.doxu.g2.gwc.crawler;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,9 +36,12 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import org.doxu.g2.gwc.crawler.model.Host;
 import org.doxu.g2.gwc.crawler.model.Service;
-import org.doxu.g2.gwc.crawler.xml.ObjectFactory;
+import org.doxu.g2.gwc.crawler.xml.Network;
 import org.doxu.g2.gwc.crawler.xml.Services;
 
 public class CrawlSession {
@@ -123,25 +131,56 @@ public class CrawlSession {
         return hosts;
     }
 
-    public String toXML() {
-        ObjectFactory factory = new ObjectFactory();
+    public String toXML() throws DatatypeConfigurationException, IOException, JAXBException {
+        Services xmlServices = createServices();
+
+            StringWriter out = new StringWriter();
+            addXMLHeader(out);
+            Marshaller jaxbMarshaller = createMarshaller();
+            jaxbMarshaller.marshal(xmlServices, out);
+            return out.toString();
+    }
+
+    public void toXMLFile(File file) throws DatatypeConfigurationException, IOException, JAXBException {
+        Services xmlServices = createServices();
+
+        try (FileWriter out = new FileWriter(file)) {
+            addXMLHeader(out);
+            Marshaller jaxbMarshaller = createMarshaller();
+            jaxbMarshaller.marshal(xmlServices, out);
+        }
+    }
+
+    private void addXMLHeader(Writer out) throws IOException {
+        out.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+                + "<?xml-stylesheet type='text/xsl' href='services.xsl'?>\n");
+    }
+
+    private Marshaller createMarshaller() throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance("org.doxu.g2.gwc.crawler.xml");
+        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+        return jaxbMarshaller;
+
+    }
+
+    public Services createServices() throws DatatypeConfigurationException {
         Services xmlServices = new Services();
+        xmlServices.setNetwork(Network.GNUTELLA_2);
+        XMLGregorianCalendar now = DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar());
+        xmlServices.setTimestamp(now);
         List<org.doxu.g2.gwc.crawler.xml.Service> serviceList = xmlServices.getService();
+        double totalScore = 0;
         for (Service service : services.values()) {
             org.doxu.g2.gwc.crawler.xml.Service xmlService = service.toXML();
+            totalScore += xmlService.getScore();
             serviceList.add(xmlService);
         }
-
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance("org.doxu.g2.gwc.crawler.xml");
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            StringWriter out = new StringWriter();
-            jaxbMarshaller.marshal(factory.createServices(xmlServices), out);
-            return out.toString();
-        } catch (JAXBException ex) {
-            Logger.getLogger(CrawlSession.class.getName()).log(Level.SEVERE, null, ex);
+        for (org.doxu.g2.gwc.crawler.xml.Service service : serviceList) {
+            service.setScore(service.getScore() / totalScore * 100.0);
         }
-        return "";
+        return xmlServices;
     }
+
 }
