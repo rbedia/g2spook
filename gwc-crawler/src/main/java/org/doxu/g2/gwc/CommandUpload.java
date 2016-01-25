@@ -19,10 +19,17 @@ package org.doxu.g2.gwc;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.converters.FileConverter;
 import java.io.File;
 
 @Parameters(commandDescription = "Upload files using SFTP")
 public class CommandUpload {
+
+    @Parameter(names = {"-d", "--directory"},
+            description = "Directory to write files",
+            converter = FileConverter.class,
+            required = true)
+    private File directory;
 
     @Parameter(names = {"-H"},
             description = "Host to upload to",
@@ -49,6 +56,10 @@ public class CommandUpload {
             description = "Remote directory to upload files to",
             required = true)
     private String remoteDir;
+
+    public File getDirectory() {
+        return directory;
+    }
 
     public String getHostname() {
         return hostname;

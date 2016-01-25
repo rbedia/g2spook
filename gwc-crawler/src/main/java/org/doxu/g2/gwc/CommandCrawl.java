@@ -19,13 +19,25 @@ package org.doxu.g2.gwc;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.converters.FileConverter;
+import java.io.File;
 
 @Parameters(commandDescription = "Perform a GWC crawl")
 public class CommandCrawl {
 
+    @Parameter(names = {"-d", "--directory"},
+            description = "Directory to write files",
+            converter = FileConverter.class,
+            required = true)
+    private File directory;
+
     @Parameter(names = {"-s", "--seed"},
             description = "GWC to crawl first")
     private String gwcSeed;
+
+    public File getDirectory() {
+        return directory;
+    }
 
     public String getGwcSeed() {
         return gwcSeed;

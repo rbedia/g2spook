@@ -18,10 +18,12 @@
 package org.doxu.g2.gwc;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.vfs2.FileSystemException;
+import org.doxu.g2.gwc.crawler.AppInfo;
 import org.doxu.g2.gwc.crawler.Crawler;
 import org.doxu.g2.gwc.crawler.CrawlerFile;
 import org.doxu.g2.gwc.crawler.OutputFiles;
@@ -38,26 +40,40 @@ public class Main {
         CommandUpload commandUpload = new CommandUpload();
         jc.addCommand("upload", commandUpload);
 
-        jc.parse(args);
+        try {
+            jc.parse(args);
 
-        String commandName = jc.getParsedCommand();
-        switch (commandName) {
-            case "crawl":
-                crawl(commandMain, commandCrawl);
-                break;
-            case "upload":
-                upload(commandMain, commandUpload);
-                break;
-            default:
-                System.out.println("Unsupported command: " + commandName);
-                break;
+            if (commandMain.printVersion()) {
+                System.out.println("gwc-crawler " + AppInfo.VERSION);
+                System.exit(0);
+            }
+
+            String commandName = jc.getParsedCommand();
+            if (commandName == null) {
+                System.out.println("No command specified.");
+                System.exit(1);
+            }
+            switch (commandName) {
+                case "crawl":
+                    crawl(commandMain, commandCrawl);
+                    break;
+                case "upload":
+                    upload(commandMain, commandUpload);
+                    break;
+                default:
+                    System.out.println("Unsupported command: " + commandName);
+                    break;
+            }
+        } catch (ParameterException ex) {
+            System.err.println(ex.getMessage());
+            jc.usage();
+            System.exit(1);
         }
-
     }
 
     private static void crawl(CommandMain commandMain, CommandCrawl crawl) {
         String startUrl = crawl.getGwcSeed();
-        File outputDir = commandMain.getDirectory();
+        File outputDir = crawl.getDirectory();
         Crawler crawler = new Crawler(startUrl);
         crawler.crawl();
         crawler.writeOutput(outputDir);
@@ -73,7 +89,7 @@ public class Main {
             File privateKey = commandUpload.getPrivateKey();
             String keyPassword = commandUpload.getKeyPassword();
             SFTPUploader uploader = new SFTPUploader(host, username, privateKey, keyPassword);
-            File localDir = commandMain.getDirectory();
+            File localDir = commandUpload.getDirectory();
             String remoteDir = commandUpload.getRemoteDir();
 
             for (CrawlerFile file : OutputFiles.list()) {

@@ -18,25 +18,22 @@
 package org.doxu.g2.gwc;
 
 import com.beust.jcommander.Parameter;
-import java.io.File;
 
 public class CommandMain {
 
-    @Parameter(names = {"-v", "-verbose"})
+    @Parameter(names = {"-v", "--verbose"})
     private boolean verbose;
 
-    @Parameter(names = {"-d", "--directory"},
-            description = "Directory to write files",
-            converter = FileConverter.class,
-            required = true)
-    private File directory;
+    @Parameter(names = {"-V", "--version"},
+            description = "Print the version and exit")
+    private boolean version;
 
     public boolean isVerbose() {
         return verbose;
     }
 
-    public File getDirectory() {
-        return directory;
+    public boolean printVersion() {
+        return version;
     }
 
 }
