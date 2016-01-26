@@ -22,10 +22,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,11 +137,11 @@ public class CrawlSession {
     public String toXML() throws DatatypeConfigurationException, IOException, JAXBException {
         Services xmlServices = createServices();
 
-            StringWriter out = new StringWriter();
-            addXMLHeader(out);
-            Marshaller jaxbMarshaller = createMarshaller();
-            jaxbMarshaller.marshal(xmlServices, out);
-            return out.toString();
+        StringWriter out = new StringWriter();
+        addXMLHeader(out);
+        Marshaller jaxbMarshaller = createMarshaller();
+        jaxbMarshaller.marshal(xmlServices, out);
+        return out.toString();
     }
 
     public void toXMLFile(File file) throws DatatypeConfigurationException, IOException, JAXBException {
@@ -182,6 +184,22 @@ public class CrawlSession {
             service.setScore(service.getScore() / totalScore * 100.0);
         }
         return xmlServices;
+    }
+
+    public void filter() {
+        // Simple (and potentially flawed) filter to remove duplicate URLs
+        Set<String> addresses = services.keySet();
+        for (Iterator<String> it = addresses.iterator(); it.hasNext();) {
+            String itAddr = it.next();
+            for (String address : addresses) {
+                if (itAddr.startsWith(address) && !itAddr.equals(address)
+                        && services.get(address).isWorking()) {
+                    it.remove();
+                    break;
+                }
+            }
+
+        }
     }
 
 }

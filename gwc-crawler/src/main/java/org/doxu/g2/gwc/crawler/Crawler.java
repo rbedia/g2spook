@@ -90,6 +90,8 @@ public class Crawler {
 
         HostChecker hostChecker = new HostChecker(session);
         hostChecker.start();
+
+        session.filter();
     }
 
     private void runQueueProcessor(CrawlThreadFactory factory, CrawlerThreadPoolExecutor executor) {
