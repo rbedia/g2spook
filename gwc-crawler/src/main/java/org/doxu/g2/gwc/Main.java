@@ -20,6 +20,8 @@ package org.doxu.g2.gwc;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.vfs2.FileSystemException;
@@ -58,7 +60,7 @@ public class Main {
                     crawl(commandMain, commandCrawl);
                     break;
                 case "upload":
-                    upload(commandMain, commandUpload);
+                    upload(commandUpload);
                     break;
                 default:
                     System.out.println("Unsupported command: " + commandName);
@@ -82,7 +84,7 @@ public class Main {
         }
     }
 
-    private static void upload(CommandMain commandMain, CommandUpload commandUpload) {
+    private static void upload(CommandUpload commandUpload) {
         try {
             String host = commandUpload.getHostname();
             String username = commandUpload.getUsername();
@@ -95,6 +97,11 @@ public class Main {
             for (CrawlerFile file : OutputFiles.list()) {
                 uploader.upload(new File(localDir, file.local), remoteDir + "/" + file.remote);
             }
+
+            CrawlerFile g2xml = OutputFiles.get(OutputFiles.Id.XML);
+            SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmm");
+            String date = format.format(new Date());
+            uploader.upload(new File(localDir, g2xml.local), remoteDir + "/history/gnutella2/" + date + ".xml");
         } catch (FileSystemException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
